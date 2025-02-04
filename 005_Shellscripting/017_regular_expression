@@ -1,0 +1,27 @@
+#!/bin/bash
+#Author: Abhirami Kannan
+#purpose: 
+#usage: ./regular_expression2.sh
+
+numString="72345689"
+if [[ $numString =~ ^1.*7 ]]; then
+    echo "$numString starts with 1 and contains 7"
+else
+    echo "its not starts with 1 and contains 7"
+fi
+if [[ $numString =~ ^7.*9 ]]; then
+    echo "$numString starts with 7 and contains 1"
+else
+    echo "its not starts with 7 and contains 1"
+fi  
+numString="abhirami"
+if [[ $numString =~ ^[A-Za-z]+$ ]]; then
+    echo "$numString contains only alphabets"
+else
+    echo "its not contains only alphabets"
+fi
+
+
+
+
+
