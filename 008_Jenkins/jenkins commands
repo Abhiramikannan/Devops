@@ -1,0 +1,39 @@
+1  cd /opt/jenkins-slave1/
+    2  ls
+    3  cd /root/.ssh/
+    4  ls
+    5  cat id_ed25519.pub 
+    6  cd /opt/
+    7  mkdir jenkins-slave1
+    8  cd jenkins-slave1/
+    9  pwd
+   10  ssh-keygen
+   11  cd /root/.ssh
+   12  ls
+   13  cat id_ed25519
+   14  cat id_ed25519.pub
+   15  vi authorized_keys 
+   16  vi authorized_keys
+   17  nano authorized_keys 
+   18  nano authorized_keys
+   19  cd .ssh/
+   20  ls
+   21  cd ..
+   22  cd /opt/
+   23  cd jenkins-slave1/
+   24  cd /root/.ssh/
+   25  ls
+   26  cat id_ed25519.pub 
+   27  docker run -d -p 8080:8080 jenkins/jenkins
+   28  ip a
+   29  docker ps
+   30  docker exec -it f3 bash
+   31  docker exec -it 08 bash
+   32  docker ps
+   33  docker exec -it 080 bash
+   34  docker exec -it bb bash
+   35  docker ps
+   36  docker stop bb
+   37  docker ps
+   38  docker ps -a
+   39  docker rm bb
