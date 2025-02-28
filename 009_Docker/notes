@@ -41,5 +41,12 @@ git --version
   107  docker build -t mycmd -f 3.cmdDockerfile .
   108  docker run mycmd
   109  docker run mycmd ls
+ls
+  112  cat 4.entrypoint 
+  113  docker build -t myentry -f 4.entrypoint .
+  114  docker run myentry
+  115  docker run myentry ls:entry point also executing
+  116  history
+
 
 
