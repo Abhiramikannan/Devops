@@ -12,4 +12,34 @@ docker run -d nginx
    77  systemctl disable docker
    78  systemctl status docker
    79  systemctl start docker
+git --version
+   82  git clone https://github.com/vilasvarghese/docker-k8s
+   83  cd docker-k8s/
+   84  cd dockerfiles/
+   85  ls
+   86  cat Dockerfile 
+   87  docker built -t from .
+   88  docker build -t from .
+   89  docker images
+   90  docker run -it from bash
+   91  ls
+   92  cat 2.Runfile 
+   93  nano 2.Runfile 
+   94  docker build -t myrun -f 2.Runfile 
+   95  docker build -t myrun -f 2.Runfile .
+   96  docker images
+   97  docker image inspect myrun
+   98  cd /var/lib/docker/overlay2/kqi302nms0e24v0jvczlf32v8/diff
+   99  ls
+  100  ls etc/
+  101  docker images
+  102  cd
+  103  cd /home/master/docker-k8s/dockerfiles/
+  104  ls
+  105  cat 3.cmdDockerfile 
+  106  docker build -t mycmd -f 3.cmdDockerfile 
+  107  docker build -t mycmd -f 3.cmdDockerfile .
+  108  docker run mycmd
+  109  docker run mycmd ls
+
 
