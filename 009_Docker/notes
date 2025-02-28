@@ -7,3 +7,9 @@ docker run -d nginx
    docker rm $(docker ps -a -q)
    docker ps -a
    docker run -d --memory-reservation=750m nginx
+ systemctl stop docker
+   76  systemctl status docker
+   77  systemctl disable docker
+   78  systemctl status docker
+   79  systemctl start docker
+
