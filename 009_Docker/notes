@@ -1,0 +1,9 @@
+docker run -d nginx
+     docker ps
+    docker stop $(docker ps -a -q)
+   docker ps
+    docker ps -a
+    docker ps --help
+   docker rm $(docker ps -a -q)
+   docker ps -a
+   docker run -d --memory-reservation=750m nginx
