@@ -12,7 +12,7 @@ docker run -d nginx
    77  systemctl disable docker
    78  systemctl status docker
    79  systemctl start docker
-git --version
+   80 git --version
    82  git clone https://github.com/vilasvarghese/docker-k8s
    83  cd docker-k8s/
    84  cd dockerfiles/
@@ -41,12 +41,16 @@ git --version
   107  docker build -t mycmd -f 3.cmdDockerfile .
   108  docker run mycmd
   109  docker run mycmd ls
-ls
+  110 ls
   112  cat 4.entrypoint 
   113  docker build -t myentry -f 4.entrypoint .
   114  docker run myentry
   115  docker run myentry ls:entry point also executing
   116  history
+  117 docker built -t myentrycmd -f 5.entrypointCmd .
+  118  docker build -t myentrycmd -f 5.entrypointCmd .
+  119  docker run myentrycmd abhi
+
 
 
 
