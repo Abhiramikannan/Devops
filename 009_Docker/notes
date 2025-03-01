@@ -53,4 +53,87 @@ docker run -d nginx
 
 
 
+docker run -it ubuntu bash
+   61  systemctl status docker
+   62  systemctl start docker
+   63  systemctl status docker
+   64  docker run -it -v /abhi
+   65  docker run -it -v /abhi:/abhi ubuntu bash
+   66  docker run -it -v /host_volume:/container_volume ubuntu bash
+   67  docker run -d -e MYSQL_ROOT_PASSWORD=admin -v /home/docker/mysql-data:/var/lib/mysql --name mysqlserver mysql
+   68  docker exec -it e5
+   69  docker exec -it e5 bash
+   70  docker exec -it 0f]
+   71  docker exec -it 0f bash
+   72  docker run -it -v abhi_volume:container_volume bash
+   73  docker run -it -v abhi_volume:/container_volume ubuntu bash
+   74  docker run -it -v abhi_volume1:/container_volume:ro ubuntu bash
+   75  docker run -it -v /container_volume ubuntu bash
+   76  docker volume ls
+   77  docker volume inspect 5b
+   78  docker volume inspect  5b9274107209d5cd4318c841386e99b444d9f9a5f2d2c981ff9dc17510fae7f9
+   79  docker run -it -v /container_volume nginx bash
+   80  docker volume ls
+   81  docker volume inspect c5
+   82  docker volume inspect 
+   83  docker volume inspect c57b50bc5913c5c5f76687f0acda2b8f6ae5d09d97b247b14e4eb9cdf7b844d8
+   84  docker ps
+   85  docker run -d -v /container_volume nginx bash
+   86  docker container inspect af
+   87  docker volume ls
+   88  docker volume inspect 37655b292f6e741e7cdce4fcdb17fb40761c9154370ee479f63b9eba2ecef30e
+   89* docker 
+   90  docker ps -a
+   91  docker container inspect af
+   92  history
+
+
+
+pt install iputils-ping -y
+   60  docker run -it ubuntu bash
+   61  cd /abhi/
+   62  ls
+   63  cd ..
+   64  ls
+   65  cd host_volume/
+   66  ls
+   67  cd akash/
+   68  ls
+   69  nano chandran.txt 
+   70  cat chandran.txt 
+   71  histoy
+   72  history
+   73  docker run -it -v /host_volume/:/nginx_container nginx bash
+   74  cd
+   75  ls
+   76  cd /var/lib/
+   77  ls
+   78  cd
+   79  cd /home/docker/mysql-data/
+   80  ls
+   81  history
+   82  docker containers
+   83  docker ps
+   84  docker kill e5
+   85  ls
+   86  cd abhi
+   87  ls
+   88  cd
+   89  docker run -d -e MYSQL_ROOT_PASSWORD=admin -v /home/docker/mysql-data:/var/lib/mysql --name mysqlserver mysql
+   90  docker run -d -e MYSQL_ROOT_PASSWORD=admin -v /home/docker/mysql-data:/var/lib/mysql --name mysqlserver1 mysql
+   91  docker ps
+   92  mysql -u root -p
+   93  docker volume ls
+   94  clear
+   95  docker volume ls
+   96  clear
+   97  docker volume ls
+   98  pwd
+   99  docker volume inspect abhi_volume
+  100  docker volume create abhi_volume1
+  101  docker volume inspect abhi_volume1
+  102  history
+
+
+
 
