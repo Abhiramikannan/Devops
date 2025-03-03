@@ -195,7 +195,39 @@ pt install iputils-ping -y
   173  docker container inspect 4b
   174  ip a
   175  history
-root@master-vm:/home/master# 
+root@master-vm:/home/master#  git clone https://github.com/vilasvarghese/docker-k8s.git
+  219  docker run -d -e MYSQL_ROOT_PASSWORD=admin -v /home/docker/mysql-data:/var/lib/mysql --name mysqlserver mysql
+  220  docker run -d -e MYSQL_ROOT_PASSWORD=admin -v /home/docker/mysql-data:/var/lib/mysql --name mysqlserver1 mysql
+  221  docker docker stop mysqlserver
+  222  docker stop mysqlserver
+  223  docker rm mysqlserver
+  224  docker ps
+  225  docker stop mysql1
+  226  docker stop mysqlserver1
+  227  docker rm mysqlserver1
+  228  docker run -d -e MYSQL_ROOT_PASSWORD=admin -v /home/docker/mysql-data:/var/lib/mysql --name mysqlserver mysql
+  229  docker exec -t 70
+  230  docker exec -it 70
+  231  docker ps
+  232  docker exec -it 70 bash
+  233  docker ps
+  234  cd docker-k8s/
+  235  cd dockerfiles/
+  236  cd frontEndAndBackEnd/webfrontend-mysqldb/
+  237  ls
+  238  nano Dockerfile.dockerfile 
+  239  docker build -t java_app .
+  240  docker build -f Dockerfile.dockerfile -t java_app .
+  241  nano Dockerfile.dockerfile 
+  242  docker build -f Dockerfile.dockerfile -t java_app .
+  243  nano Dockerfile.dockerfile 
+  244  docker build -f Dockerfile.dockerfile -t java_app .
+  245  nano Dockerfile.dockerfile 
+  246  docker build -f Dockerfile.dockerfile -t java_app .
+  247  dockern run -d -p 8080:8080 --link mysqlserver
+  248  docker run -d -p 8080:8080 --link mysqlserver
+  249  history
+
 
 
 
