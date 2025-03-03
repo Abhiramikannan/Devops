@@ -133,6 +133,71 @@ pt install iputils-ping -y
   100  docker volume create abhi_volume1
   101  docker volume inspect abhi_volume1
   102  history
+137  docker --version
+  138  systemctl status docker
+  139  systemctl start docker 
+  140  ip a
+  141  docker ps
+  142  docker run -d nginx
+  143  docker container inspect c6
+  144  ip a
+  145  docker network ls
+  146  docker network inspect bridge
+  147  docker ps
+  148  docker run -it alpine ash
+  149  docker ps
+  150  docker stop $(docker ps -q)
+  151  docker ps
+  152  docker rm $(docker ps -a -q)
+  153  docker ps
+  154  docker ps -a
+  155  docker run -it --name alpine1 aphine ash
+  156  docker run -it --name alpine1 apine ash
+  157  docker run -it --name alpine1 alpine ash
+  158  history
+ ip a
+  137  docker ps
+  138  docker container inspect f3
+  139  docker network create mybridge
+  140  docker network ls
+  141  ip a
+  142  docker run -d --net mybridge nginx
+  143  docker container inspect 1a
+  144  ip a
+  145  docker run -d --net mybridge alpine ash
+  146  docker run -it --net mybridge alpine ash
+  147  docker run -d --net host nginx
+  148  docker ps
+  149  docker container inspect 04
+  150  curl localhost
+  151  docker run -d --net host nginx
+  152  docker p
+  153  docker ps
+  154  docker ps -a
+  155  docker container inspect e9
+  156  docker logs e9
+  157  docker run -it --net alpine2 alpine ash
+  158  docker run -it --net mybridge --net alpine2 alpine ash
+  159  docker run -it --net mybridge --name alpine2 alpine ash
+  160  docker ps -a
+  161  docker container inspect 309
+  162  docker ps -a
+  163  docker container inspect 4b
+  164  docker container inspect 309
+  165  docker ps -a
+  166  docker run -d --net host nginx
+  167  docker container inspect e7
+  168  docker container inspect 4b
+  169  docker ps -a
+  170  docker container inspect 309
+  171  docker start 309
+  172  docker container inspect 309
+  173  docker container inspect 4b
+  174  ip a
+  175  history
+root@master-vm:/home/master# 
+
+
 
 
 
