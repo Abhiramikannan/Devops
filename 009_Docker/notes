@@ -231,6 +231,7 @@ get inside container: docker exec -it 70b bash
 get into mysql
 create databse and search on browser ->portforwarding
 http://localhost:8080/HelloWorld/customers.jsp
+          connect frontend and backend
 
 
 
