@@ -227,6 +227,11 @@ root@master-vm:/home/master#  git clone https://github.com/vilasvarghese/docker-
   247  dockern run -d -p 8080:8080 --link mysqlserver
   248  docker run -d -p 8080:8080 --link mysqlserver
   249 docker run -d -p 8080:8080 --link mysqlserver:mysqldb  java_app
+get inside container: docker exec -it 70b bash
+get into mysql
+create databse and search on browser ->portforwarding
+http://localhost:8080/HelloWorld/customers.jsp
+
 
 
 
