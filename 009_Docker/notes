@@ -226,7 +226,8 @@ root@master-vm:/home/master#  git clone https://github.com/vilasvarghese/docker-
   246  docker build -f Dockerfile.dockerfile -t java_app .
   247  dockern run -d -p 8080:8080 --link mysqlserver
   248  docker run -d -p 8080:8080 --link mysqlserver
-  249  history
+  249 docker run -d -p 8080:8080 --link mysqlserver:mysqldb  java_app
+
 
 
 
