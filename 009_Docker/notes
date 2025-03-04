@@ -289,6 +289,34 @@ cd docker-k8s/
 
 
 
+afternoon
+
+git clone https://github.com/vilasvarghese/frankenphp-drupal
+  313  cd frankenphp-drupal/
+  314  ls
+  315  cat Dockerfile 
+  316  ls
+  317  cat compose.yaml 
+  318  docker compose up -d
+  319  curl localhost:80
+  320  cd ..
+  321  ls
+  322  cd bitespeed_assignment/
+  323  cat Dockerfile 
+  324  cd ..
+  325  cd frankenphp-drupal/
+  326  curl localhost:80
+  327  docker ps
+  328  curl localhost:80
+  329  ls
+  330  cat Dockerfile 
+  331  curl localhost:80
+  332  docker swarm init
+  333  ip a
+  334  history
+
+
+
 
 
 
