@@ -235,6 +235,60 @@ http://localhost:8080/HelloWorld/customers.jsp
 
 
 
+march 4
+
+cd docker-k8s/
+  259  ls
+  260  cat dc1.yaml 
+  261  docker compose -f dc1.yaml up -d
+  262  docker ps
+  263  docker ps -a
+  264  docker network ls
+  265  nano Dockerfile
+  266  docker compose -f dc1.yaml up -d
+  267  curl localhost 8080
+  268  cat dc2.yaml 
+  269  docker ps
+  270  docker compose -f dc2.yaml up -d
+  271  curl localhost:8080
+  272  cd
+  273  git clone https://github.com/dockersamples/example-voting-app.git
+  274  cd example-voting-app/
+  275  cd vote/
+  276  ls
+  277  cat app.py 
+  278  cd ..
+  279  ls
+  280  cd vote
+  281  ls
+  282  cat Dockerfile 
+  283  ls
+  284  cd ..
+  285  ls
+  286  cat docker-compose.yml
+  287  cd result/
+  288  cat Dockerfile 
+  289  cd ..
+  290  ls
+  291  cat docker-compose.yml 
+  292  cd worker/
+  293  ls
+  294  cat Dockerfile 
+  295  cd ..
+  296  ls
+  297  cat docker-compose.yml 
+  298  ls
+  299  cd seed-data/
+  300  ls
+  301  cd ..
+  302  docker compose up -d
+  303  docker ps
+  304  curl localhost:8080
+  305  curl localhost:80
+  306  history
+
+
+
 
 
 
