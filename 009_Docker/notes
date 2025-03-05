@@ -317,6 +317,48 @@ git clone https://github.com/vilasvarghese/frankenphp-drupal
 
 
 
+docker swarm
+
+docker service create -p 80:80 --replicas 2 --name webserver nginx
+  343  docker service ls
+  344  docker service ps webserver
+  345  curl localhost
+  346  curl node1-vm
+  347  cur node2-vm
+  348  curl node2-vm
+  349  docker ps
+  350  docker container ls
+  351  docker service create -p 80:80 --replicas 1 --name webserver nginx
+  352  docker service create -p 81:80 --replicas 5 --name webserver nginx
+  353  docker service create -p 81:80 --replicas 5 --name webserver1 nginx
+  354  docker service ls
+  355  docker service ps webserver1
+  356  docker run -d -p 80:80 nginx
+  357  docker network ls
+  358  docker service ls
+  359  docker service ps webserver1
+  360  docker service inspect webserver
+  361  docker service inspect webserver1
+  362  docker network -d overlay myoverlay
+  363  docker network create -d overlay myoverlay
+  364  docker network ls
+  365  docker ps
+  366  docker container inspect 42
+  367  ip a
+  368  docker ps
+  369  docker exec -it 42 bash
+  370  docker service create --replicas 2 --name alpine alpine sleep 5000
+  371  docker service ls
+  372  docker service ps alpine
+  373  docker exec -it hh bash
+  374  docker ps
+  375  docker exec -it db bash
+  376  docker exec -it db ash
+  377  history
+
+
+
+
 
 
 
