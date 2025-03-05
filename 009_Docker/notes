@@ -356,6 +356,41 @@ docker service create -p 80:80 --replicas 2 --name webserver nginx
   376  docker exec -it db ash
   377  history
 
+ docker service create  --replicas 2 --name alpine1 alpine sleep 5000
+  385  docker service create  --replicas 2 --name alpine2 alpine sleep 5000
+  386  docker service ls
+  387  docker service ps hh
+  388  docker service ps 9d
+  389  docker service create  --replicas 2 --name alpine3 alpine sleep 5000
+  390  docker service ps
+  391  docker service ls
+  392  docker service ps ky
+  393  docker service rm us
+  394  docker service rm alpine1
+  395  docker service rm alpine
+  396  docker service rm alpine3
+  397  docker service create  --replicas 2 --name alpine alpine sleep 5000
+  398  docker service ls
+  399  docker service ps rl
+  400  docker service create --name abhiservice -p 83:80 --replicas 1 --net myoverlay nginx
+  401  docker service create --name abhiservice -p 83:80 --replicas 1 --network myoverlay nginx
+  402  curl localhost:83
+  403  docker service create --name testupdate -p 84:80 --replicas 3 nginx
+  404  docker service ls
+  405  docker service ps uh
+  406  watch -n -1 docker service ps uh
+  407  watch -n 1 docker service ps uh
+  408  docker service rm testupdate
+  409  docker service create --name testupdate -p 84:80 --replicas 3 nginx:1.9.1
+  410  docker service rm testupdate
+  411  docker service create --name testupdate -p 84:80 --replicas 3 nginx:1.16.1
+  412  watch -n 1 docker service ps testupdate
+  413  docker login -u abhiramikannan
+  414  watch -n 1 docker service ps testupdate
+  415  docker service update --image nginx:latest testupdate
+  416  history
+
+
 
 
 
