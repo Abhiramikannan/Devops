@@ -1,0 +1,166 @@
+---
+# 🧠 1. Dynamic Role-Based Deployment
+
+## ❓ Question:
+Automate the deployment of a web server and a MySQL database using Ansible roles. Use environment-specific logic (e.g., Apache for staging, Nginx for production), vault-encrypted secrets, and ensure reusability via role-based structure.
+
+## Folder Structure:
+# ansible-dynamic-deploy/
+# ├── ansible.cfg
+# ├── inventory/
+# │   └── hosts
+# ├── group_vars/
+# │   └── all/
+# │       └── vault.yml
+# ├── roles/
+# │   ├── web/
+# │   │   └── tasks/
+# │   │       └── main.yml
+# │   └── mysql/
+# │       └── tasks/
+# │           └── main.yml
+# └── site.yml
+
+## 🔧 Commands:
+mkdir -p ansible-dynamic-deploy/{{inventory,group_vars/all,roles/web/tasks,roles/mysql/tasks}}
+cd ansible-dynamic-deploy
+
+# Create ansible.cfg
+cat > ansible.cfg <<EOF
+[defaults]
+inventory = ./inventory/hosts
+roles_path = ./roles
+EOF
+
+# Create inventory/hosts
+cat > inventory/hosts <<EOF
+[webservers]
+192.168.56.10 ansible_user=ubuntu
+
+[webservers:vars]
+env=prod
+EOF
+
+# Create roles/web/tasks/main.yml
+cat > roles/web/tasks/main.yml <<EOF
+- name: Install Apache on staging
+  apt:
+    name: apache2
+    state: present
+  when: env == "staging"
+  tags: apache
+
+- name: Install Nginx on prod
+  apt:
+    name: nginx
+    state: present
+  when: env == "prod"
+  tags: nginx
+EOF
+
+# Create roles/mysql/tasks/main.yml
+cat > roles/mysql/tasks/main.yml <<EOF
+- name: Install MySQL Server
+  apt:
+    name: mysql-server
+    state: present
+
+- name: Set root password
+  mysql_user:
+    name: root
+    password: "{{ mysql_root_password }}"
+    host_all: yes
+  become: yes
+
+- name: Allow port 3306
+  ufw:
+    rule: allow
+    port: 3306
+    proto: tcp
+EOF
+
+# Create encrypted vault file
+ansible-vault create group_vars/all/vault.yml
+# Inside the vault file:
+# mysql_root_password: "prod@123"
+
+# Create site.yml
+cat > site.yml <<EOF
+- name: Multi-Environment Web Setup
+  hosts: webservers
+  become: yes
+  vars_files:
+    - group_vars/all/vault.yml
+  roles:
+    - web
+    - mysql
+EOF
+
+# Run Playbook
+ansible-playbook site.yml --tags nginx --ask-vault-pass
+
+---
+# 🔐 2. Secure MySQL Deployment
+
+## ❓ Question:
+Install MySQL securely using Ansible. Set root password using vault and allow access on port 3306. Make sure MySQL service is started.
+
+## Commands:
+mkdir -p roles/mysql/tasks
+# Already included above
+
+---
+# 🐳 3. Docker with Ansible
+
+## ❓ Question:
+Use Ansible to install Docker, pull a Docker image, and run an Nginx container. Ensure the container starts on boot and maps port 80.
+
+## Commands:
+mkdir -p roles/docker/tasks
+
+# Create roles/docker/tasks/main.yml
+cat > roles/docker/tasks/main.yml <<EOF
+- name: Install Docker
+  apt:
+    name: docker.io
+    state: present
+
+- name: Ensure Docker service is running
+  service:
+    name: docker
+    state: started
+    enabled: yes
+
+- name: Pull Nginx image
+  docker_image:
+    name: nginx
+    source: pull
+
+- name: Run nginx container
+  docker_container:
+    name: nginx_web
+    image: nginx
+    state: started
+    restart_policy: always
+    ports:
+      - "80:80"
+EOF
+
+# Add 'docker' to roles in site.yml manually if needed
+
+---
+# 🔪 4. Git-Based Deployment CI/CD
+
+## ❓ Question:
+Use Ansible to clone a git repository based on a given branch and deploy it to a web server path. Enable switching between environments using a variable.
+
+## Task to add in site.yml:
+- name: Clone App
+  git:
+    repo: 'https://github.com/yourorg/app.git'
+    dest: /var/www/html
+    version: "{{ git_branch }}"
+  when: git_branch in ['main', 'dev']
+
+## Run Command:
+ansible-playbook site.yml -e git_branch=main --ask-vault-pass
