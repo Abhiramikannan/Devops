@@ -1,0 +1,277 @@
+ Imagine Docker containers as isolated houses inside a city. 
+ Just like houses need roads and addresses to communicate, Docker containers need networks
+ to talk to each other and the outside world.
+
+
+ 
+ What is Docker Networking? (Simple Explanation)
+Docker Networking allows containers to communicate with:
+✅ Each other (inside the same or different hosts)
+✅ The host machine
+✅ The external world (Internet, users, etc.)
+
+
+Types of Docker Networks
+1️⃣ Bridge (Default) - Containers talk to each other inside the same host using IP addresses. ✅
+2️⃣ Host - Containers share the host’s network. No isolation ❌
+3️⃣ Overlay - Connects containers across multiple Docker hosts (used in Swarm). 🌍
+4️⃣ Macvlan - Assigns real network interfaces to containers. 🖧
+5️⃣ None - Completely disables networking. 🚫
+
+Basic Networking Concepts:
+  
+        ip address: unique routable address given to a device on a network follows ip protocol
+                    :network have CIDR
+        Ethernet card: wired cable connected to a socket..
+        Ethernet cable:wired cable
+        network switch: broadcast the ip with in the network
+            arp caching:cach the data by saying the ip address is related to that mac address
+
+            arp->broadcast ip sents the msg... using handshake signal
+                cach the mac address at the last
+
+        Nating/Denating:
+                NAT (Network Address Translation):
+                Converts private container IPs to a public IP when accessing the outside world.
+                Docker uses NAT for external access (e.g., -p 8080:80 maps port 80 inside the container to 8080 on the host).
+            gateway:connect 2 diff type of network
+            nating:from adrress is changed to that of gateway(priv ip to public)
+
+        subnet and subnetting: first 2 ip is reserved for network and broadcast
+   
+Docker default network bridge:
+                 
+When Docker is installed, it automatically creates a default bridge network called docker0
+eth0 -> root nic in vm -ip a(show networking images)
+        lo -loopback -whenever u communicate with local host(acc to ip protocol)
+Default ip range of docker 0:
+            172.17.0.1 -172.17.255.255
+        CIDR: 172.17.0.0/16
+docker network ls -> You will see a network named bridge, which is docker0.
+docker network inspect bridge ->  Look for "Subnet": "172.17.0.0/16" and "Gateway": "172.17.0.1",
+                        which means all containers on this network get an IP in this range.
+
+Step 3: Run Two Containers in Default Bridge
+      docker run -dit --name container1 alpine sh  
+      docker run -dit --name container2 alpine sh
+These two containers are now connected to the docker0 bridge.
+
+sh (Shell) → Default shell in Alpine (linked to BusyBox shell).
+ash (Almquist Shell) → A lightweight shell that sh is pointing to in Alpine
+
+why -dit?
+🔹 -d → Detached mode (Runs the container in the background)
+🔹 -i → Interactive mode (Keeps STDIN open for interaction)
+🔹 -t → TTY mode (Allocates a pseudo-terminal for user input)
+Why not just -d or -it alone?
+If we use only -d, the container runs in the background but exits immediately if no process keeps it alive.
+If we use only -it, the container runs interactively but blocks the terminal until we exit.
+Combining -dit allows us to run the container in the background while keeping it interactive if we want to attach to it later.
+
+How to Ensure These Containers Are Connected to docker0?
+
+        Step 1: Check the network of a running container
+                docker inspect container1 | grep "IPAddress"
+                docker inspect container2 | grep "IPAddress"
+        Step 2: List networks and check 
+                docker network ls
+This confirms that the default bridge (docker0) exists.
+        docker network inspect bridge
+        If container1 and container2 appear in the list of "Containers", they are connected to docker0.
+
+
+docker exec -it container1 sh    / docker exec -it container1 ip a
+ip a
+docker exec -it container2 ip a
+docker exec -it container1 ping 172.17.0.Y  # Replace with container2's IP
+
+
+
+
+Creating Another Bridge Network and Connecting Containers Using veth
+
+    Step 1: Create a New Bridge Network
+        docker network create my_bridge
+        This creates a new bridge separate from docker0.
+
+    Step 2: Run a Container in the New Bridge
+        docker run -dit --name container3 --network my_bridge alpine sh
+        This container is not connected to docker0 but to my_bridge.
+
+    Step 3: Try to Ping container1 from container3 (Fails)
+        docker exec -it container3 ping 172.17.0.2  # container1's IP
+
+    Step 4: Manually Connect container3 to docker0 Using veth
+        docker network connect bridge container3
+         Now, container3 is connected to both networks (my_bridge and docker0).
+
+    Step 5: Try to Ping Again (Works)
+        docker exec -it container3 ping 172.17.0.2
+        Now it works because container3 is connected to docker0 via veth.
+
+Communication works when the containers share a common bridge network.
+
+docker network rm my_network --> remove network
+docker network prune --> remove all unused network
+
+default bridge network (docker0) does not support name-based communication between containers. Containers connected to the default bridge can only communicate using IP addresses, not container names.
+        docker exec -it container1 ping container2 -> fails
+        Docker's default bridge network does not have DNS resolution for container names.
+
+Port mapping -p 8080:80 is useless for Alpine → Alpine is just a minimal OS with no web server running on port 80.
+
+        docker run -dit --name mynginx -p 8080:80 nginx
+        Now, you can access Nginx via http://localhost:8080.
+
+        docker inspect mynginx | grep '"HostPort"' -> It should show 8080 mapped to 80 inside the container.
+        curl localhost:8080 -> Access from a browser:
+        docker logs mynginx
+
+
+
+Docker custom bridge Network:
+
+                              named communication
+when you create a custom bridge, it:
+✅ Allows communication using container names (Docker DNS resolves them).
+✅ Provides better control over network settings (IP range, subnet, etc.).
+✅ Isolates containers from the default network (docker0).
+1️⃣ Create a Custom Bridge Network
+
+docker network create --driver bridge my_bridge
+This creates a new bridge network separate from docker0, allowing name-based communication.
+
+2️⃣ Run Containers Inside the Custom Network
+
+docker run -dit --name container1 --network my_bridge alpine sh
+docker run -dit --name container2 --network my_bridge alpine sh
+🚀 Now, these containers can communicate using their names!
+
+3️⃣ Test Communication Between Containers
+
+docker exec -it container1 ping container2  # Works!
+✅ In the default bridge, this would fail because DNS resolution is disabled.
+
+4️⃣ Inspect the Network
+
+docker network inspect my_bridge
+✅ Shows details like subnet, gateway, and connected containers.
+
+5️⃣ Connect an Existing Container to the Custom Network
+
+docker network connect my_bridge container1
+6️⃣ Disconnect a Container from the Network
+
+docker network disconnect my_bridge container1
+7️⃣ Remove the Custom Network
+
+docker network rm my_bridge
+⚠ You must stop & remove all containers first!
+
+🔹 Summary: When to Use a Custom Bridge Network?
+✅ If you need containers to communicate by name (ping container1)
+✅ If you want more security & isolation
+✅ If you need better control over IP range & settings
+
+
+Docker host:
+      The host network mode allows a container to share the same network namespace as the host machine. This means the container does not get its own IP address but instead uses the host’s IP.
+
+      Run a container using the host network with:
+             docker run -d --net=host --name mynginx nginx
+
+ What happens here?
+
+The container directly uses the host’s network (no separate IP).
+If you run nginx inside the container, it will be available on the host’s port 80 without port mapping (-p).
+No need for NAT (Network Address Translation), so it's faster.
+
+When to Use Host Network?
+✅ Best for high-performance apps (e.g., databases, real-time applications).
+✅ When containers need to listen on host ports directly (e.g., monitoring tools).
+✅ For simplicity, avoiding complex networking setups.
+
+ Limitations:
+❌ No isolation—containers share network with the host.
+❌ Only works on Linux (not available on Docker for Windows/Mac).
+
+
+Docker null:
+
+   ### **Docker Null Network (None Network Mode)**  
+
+The **null network** (or **none network mode**) in Docker **completely disables networking** for a container. This means the container **cannot send or receive network traffic**.  
+
+---
+
+### **How to Use None Network?**  
+Run a container with **no network access**:  
+```bash
+docker run -d --net=none --name mycontainer alpine sleep 1000
+```
+🚀 **What happens here?**  
+- The container **has no network interfaces** except `lo` (loopback).  
+- It **cannot communicate** with other containers or the internet.  
+- No IP address is assigned (except `127.0.0.1` inside the container).  
+
+---
+
+### **Use Cases of None Network**
+✅ **Security**: Prevents any network access for sensitive apps.  
+✅ **Debugging**: Test applications without network dependencies.  
+✅ **Custom Networking**: Manually attach it to a custom network later.  
+
+---
+
+### **How to Check Network Configuration?**
+After running a container with `--net=none`, check its interfaces:  
+
+docker exec -it mycontainer sh
+ip a
+
+🚨 **You'll see only `lo` (loopback), no `eth0` interface!**  
+
+Docker Overlay Network:
+
+The overlay network in Docker is used for multi-host communication in a Swarm cluster. It allows containers running on different nodes (machines) to communicate as if they are on the same network.
+
+How Overlay Network Works?
+1️⃣ Multiple hosts (nodes) join a Docker Swarm
+2️⃣ An overlay network is created, and all participating nodes connect to it
+3️⃣ Containers on different nodes can communicate securely without exposing services externally
+
+Key Features of Overlay Network
+✅ Multi-host communication (different machines)
+✅ Internal DNS resolution (containers can communicate using names)
+✅ Secure traffic using encryption
+✅ Does not require port mapping
+
+How to Use Overlay Network?
+1️⃣ Initialize Docker Swarm
+Before creating an overlay network, enable Swarm mode:
+docker swarm init
+
+2️⃣ Create an Overlay Network
+docker network create --driver overlay my_overlay
+🔹 --driver overlay → Creates an overlay network
+
+3️⃣ Deploy Services Using the Overlay Network
+
+docker service create --name myservice --network my_overlay nginx
+🔹 This runs an NGINX service on the overlay network, allowing multiple replicas across different nodes to communicate.
+
+4️⃣ Verify the Network
+
+docker network ls
+docker network inspect my_overlay
+
+When to Use Overlay Network?
+✅ When running Docker Swarm with multiple nodes
+✅ When you need multi-host container communication
+✅ When you want automatic service discovery
+
+
+Macvlan Network in Docker: What It Is & How It Works
+
+📌 What is a Macvlan Network?
+A Macvlan network allows Docker containers to have their own unique MAC addresses and appear as physical devices on the network. Unlike the default bridge or overlay network, Macvlan bypasses NAT and provides direct access to the external network.
