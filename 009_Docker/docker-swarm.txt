@@ -1,0 +1,114 @@
+docker swarm init -> initilalizes swarm
+docker info -> see swarm is active or not
+docker node ls -> display all 3 host where swarm is running 
+docker service create -p 80:80 --replicas 2 --name webserver nginx -> create a service
+            -p -> try to attach to port,connecting to ingress network
+            2 tasks got created initially in master
+            task -> represnting phy instance
+            container created using nginx image
+            The container is attached to the Swarm network.
+            Each task corresponds to one container running an instance of nginx
+             Task Scheduling
+                Swarm checks which nodes are available in the cluster.
+                It assigns tasks to nodes based on factors like resource availability and constraints.
+                Tasks are then distributed across worker nodes (if available).
+docker service ls -> list all services
+docker service ps webserver -> list all tasks
+
+curl localhost
+curl node1-vm -> to check is it running
+curl node2-vm -> to check is it running
+
+why it is accesible on 3 nodes?
+docker is creating a load balancer and automatically forward to 
+
+
+Why Can't Docker Swarm Create an Extra Replica Even If a Machine is Free?
+docker service create -p 80:80 --replicas 1 --name webserver nginx -> cant work
+                        port is blocked already
+
+
+docker service create -p 81:80 --replicas 5 --name webserver1 nginx
+docker run -d -p 80:80 nginx --> no port binding,already used
+
+even if u try to install software on same port -> not work
+
+
+Why is Node 2 Showing "Thank You for Using Nginx" Even Though No Container is Running There?
+✔️ Yes, because a virtual load balancer (Routing Mesh) is cutting across every machine.
+    also no port binding is done
+
+
+docker overlay networks and vxlan
+
+service
+load increases -> create more replicas
+forwards the request to the container which is not bc by load balancer
+no gurantie foe which machine is going to be forwarded
+multiple replicas in one system -> docker service ls
+                                   docker service ps webserver1
+
+overlay is used in swarm
+ingress network
+
+
+all the masters will be active on kubernetics
+docker -> master-slave architecture
+kubernetics -> master-master architecture
+
+
+networking
+  docker network create -d overlay myoverlay
+      ingress->default,independent gateway
+      overlay ->network top of 
+                deliver to machine,deliver to actual container
+
+when u create network 
+            br - virtual network switch created
+            pock rules in ip entry tables
+
+
+docker service rm <id>
+
+
+docker service create -p 80:80 --replicas 5 --name <alpine_container> <alpine_image> sleep 5000
+-p : connect to overlay
+no -p : connect to default bridge
+ip a
+10 series -> overlay
+172. -> default bridge
+
+
+
+docker service create abhi_service -p 82:80 --replicas 1 --network myoverlay nginx ->
+                                                
+
+
+
+
+watch ->execute every 2 sec
+
+
+
+spring boot application:
+        ./mvnw clean install
+        sudo su
+        sudo apt install -y
+        update-alternatives --config java
+        export JAVA_HOME=/usr/lib/jvm/java -17-openjd-amd64
+        java -jar target/demo .....tab
+        go to browser
+        type->localhost:8080/hello
+                whitelabel error -> working
+        
+inside restcontroller->req mapping -> 
+
+same folder go
+go to docker hub search java..openjdk code copy in a notepad
+create new file 
+
+java -jar target/demo-0.0.1-SNAPSHOT.jar
+docker run -d -p 8080:8080 java_image 
+curl localhost:8080/hello
+
+docker logs containerid
