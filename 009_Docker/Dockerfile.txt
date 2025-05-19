@@ -1,0 +1,33 @@
+FROM node:14-alpine
+
+WORKDIR /app ## creating a working directory inside image, this will be referred by container 
+
+COPY package*.json . ## copying package.json and package-lock.json to the working directory, 
+            this is done to install the dependencies before copying the whole data, 
+            so that we can use layer caching, if we make any changes in the code, it will not re-run the npm install command
+
+RUN npm install ## this command will install all the dependencies mentioned in package.json file     
+
+COPY . . ## we are copying the whole data because thats how are application will run 
+            copying from current folder to work directory
+
+EXPOSE 5000 ## exposing port 5000 to access the application, which port container will be running
+
+RUN something 
+
+CMD ["npm", "start"] ## this command will run when the container is started
+
+
+
+====================================================================
+layer caching:  if we made a change in the existing code with some run commands,
+                then docker will not re-run the commands, it will just use the existing layer,  
+                only the layers build after the run commands will be  rebuilded.
+
+
+the code part will change frequently and dependencies not
+so making the application dependencies above the code part(copied the file before code part)
+and made the changes in code after that command
+so the layers needed to build is reduced
+
+==========================================================================
