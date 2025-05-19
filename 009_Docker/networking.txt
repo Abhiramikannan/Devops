@@ -275,3 +275,23 @@ Macvlan Network in Docker: What It Is & How It Works
 
 📌 What is a Macvlan Network?
 A Macvlan network allows Docker containers to have their own unique MAC addresses and appear as physical devices on the network. Unlike the default bridge or overlay network, Macvlan bypasses NAT and provides direct access to the external network.
+
+
+host network
+create container attcah to host network,
+    automatically connected to host  machines network,
+    no port forwarding req
+
+docker run -d --net host nginx=:not listening to port 80
+                                no ip address
+                    again try to create another container with same name, it will not work
+                    cant see the container in docker ps,you can see container got exited 
+                    because the port is already in use,network range also already in use
+                    so it will not work
+
+
+null: when u create  container and attach to none network
+    no ip
+    no network
+    y: to provide your own network 
+
