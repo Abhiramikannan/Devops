@@ -1,0 +1,122 @@
+What are Volumes in Docker? 
+Volumes in Docker are used to store data so that it is not lost when a container stops or is deleted. 
+They are outside the container's filesystem and managed by Docker.
+
+Key Takeaways
+Volumes store persistent data.
+Data is not lost when a container stops.
+Multiple containers can share the same volume.
+Managed by Docker, unlike bind mounts (which use host paths).
+
+
+Why Use Volumes?
+Data Persistence – Even if a container is deleted, the data remains.
+Sharing Data – Multiple containers can access the same data.
+Better Performance – More efficient than bind mounts.
+Easier Backups – Docker manages volumes separately.
+
+1. Create a Volume
+            docker volume create my_volume
+            Creates a new empty volume.
+2. Use a Volume in a Container
+            docker run -d -v my_volume:/app_data nginx
+            -v my_volume:/app_data → Mounts my_volume to /app_data inside the container.
+            Any file saved in /app_data will persist, even if the container is removed.
+3. List Volumes
+            docker volume ls
+            Shows all volumes.
+4. Inspect a Volume
+            docker volume inspect my_volume
+            Displays volume details like location on disk.
+5. Remove a Volume
+            docker volume rm my_volume
+            Deletes a specific volume (data will be lost).
+6. Remove All Unused Volumes
+            docker volume prune
+            Deletes all volumes not used by any container.
+
+Example: Sharing a Volume Between Containers
+    docker run -d -v shared_data:/data --name container1 ubuntu
+    docker run -d -v shared_data:/data --name container2 ubuntu
+    container1 and container2 can both access /data.
+
+
+
+
+
+
+
+
+
+persistent types:
+    tempfs
+    bindmount
+    volumes:
+        named
+        anonymous
+
+tempfs:
+    stores data in memory
+    container gone,data gone
+    sometimes the data in the container u dont want
+    reduce size of writable layer
+    when  u start the container  refer to image and writable layer
+    writable layer increases-time taken to start container increases
+
+bindmount:
+    attach any locn of host machine to container
+    3 parameters after -V
+        1.where on the host machine
+        2.inside a container
+                     -mandatory
+        3.what is the access type
+        all seperated by colon
+
+1st parameter: like $pwd -folder path as bind mount
+2nd parameter : location
+
+docker volume create myvolume  : Creates a new empty volume.
+        create folder inside /var/lib/docker/volumes
+             inside it create folder with name myvolume
+                    inside it create folder with name: _data -this will be attached to container
+
+
+                docker run -v /abhiramivolume -bindmount -create folder root of linux machine
+                docker run -v abhiramivolume:/dest - docker volume
+                only root user can come into it.
+                mistake : u can attach an imp directory by using /home/...-security risk..in bindmount
+
+anonymous volume: no source given
+    read only permission only u will get inside container
+    docker run -d -v/test nginx
+
+commands:
+
+
+volumes:
+        docker volume create my_volume --> create volume named my_volume
+        docker volume ls --> list volume
+        docker volume inspect my_volume --> inspect volume
+        docker volume rm my_volume --> remove volume
+        docker volume prune --> remove all unused volume
+
+        docker run -d -v /home/user/data:/app/data ubuntu --> bind mount
+
+                Binds the /home/user/data folder from the host to /app/data in the container.
+                Changes inside the container reflect on the host, and vice versa.   
+
+        docker run -v my_named_volume:/data ubuntu --> named volume
+
+                    Attaches the named volume my_named_volume to /data in the container.
+                    Docker manages the storage (useful for databases).
+
+
+        docker run -v /data ubuntu --> anonymous volume
+
+                    Creates an unnamed volume automatically, useful for temporary data.
+
+
+        docker run -v my_volume:/app/data:ro ubuntu --> change to read only
+
+                        Mounts my_volume as read-only (ro = Read-Only).
+                        The container cannot modify files inside /app/data.
