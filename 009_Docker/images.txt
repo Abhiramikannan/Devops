@@ -117,3 +117,18 @@ volume - create ananoymous volume and attach it to container
         anonymous volume created in volums folder in var/lib/docker/random long big num/_data
 
 
+performance:
+        lesser the number of layers better the performance of container
+         1. combining run commands
+         2. use multistage build --> multiple FROM
+         3. minimize num of copy and add instructions
+         4. use .dockerignore file to exclude unnecessary files.
+         5. Use slim base images like alpine instead of larger images.
+         6.  Clean up temporary files and caches in the same RUN instruction to avoid extra layers.
+
+
+
+Cannot Remove Image:
+        if a image is having  stopped or running container cant remove the image
+        if another image refering to an image cannot remove that image
+        solution: remove container
