@@ -1,0 +1,134 @@
+1. docker compose : 
+docker compose is used to refer to a Compose file that defines multiple containers, networks,
+and volumes in one place.
+ manage multiple containers together
+        feature
+        multi container u can do
+        refer docker file execute 1 command..building image from docker file ,
+        docker compose file: also mention image
+                dwld image and create a container
+
+            when u create a container from doker compose,default create bridge network
+                attach all containers created with that network
+                mention multiple containers(services)
+
+    cd dockerk8s
+    ls
+    cat dc1.yml
+          sevices: 
+
+file name: docker compose.yml ->dont give file name
+                otherwise -f
+
+docker compose -f dc1.yaml up -dc1
+-f dc1.yaml: Specifies the Compose file to use.
+-d: Runs the containers in detached mode (background).
+
+   not create new network for other one:
+           The issue occurs because Docker Compose reuses networks instead of creating a new one
+            if:
+
+            No network is explicitly defined in dc1.yaml.
+            A named network in dc1.yaml already exists.
+
+When you run:
+
+docker compose -f dc1.yaml up -d
+
+What Happens Internally?
+Reads dc1.yaml → Docker Compose loads the configuration (services, networks, volumes).
+Creates Network (if not already exists) → Uses a bridge network by default.
+Creates Volumes (if defined) → Ensures persistent storage.
+Pulls Images (if not available locally) → Downloads from Docker Hub or private registry.
+Creates & Starts Containers → Launches services in detached mode (-d).
+Sets Up Dependencies → Ensures services start in the correct order.
+Simple Example Flow:
+You define two services (app & db) in dc1.yaml.
+Running docker compose up -d:
+Creates a shared network → dc1_default.
+Pulls app and db images.
+Starts both containers inside the network.
+
+
+docker network ls
+curl localhost:8080
+docker ps :can see docker-k8s-web
+       folder name service name
+
+automatically dwld and create a container
+build- locn of dockrfile
+        name of image
+
+docker compose -f dc2.yml up -d 
+up: run and build
+compose:refer compose file like docker network
+curl localhost:8080
+
+
+
+build->point to docker file  ./
+
+
+
+cloning voting app.git
+cd example voting app/vote
+cat Dockerfile
+
+requirements.txt: Dependencies
+
+as base: initial part of image
+base layer
+install curl
+set wd of image
+copy req.txt to wd
+running pakage installer
+created a new storage
+using prvous base image
+flask env
+command run whn
+expose 80
+starting the execution using gunicorn
+0.0.0.0 :bind into local host
+
+cd ..
+ls
+cat docker-compose.yml
+
+
+   
+result : another service
+build : locn of docker file 
+cd result
+cat Dockerfile 
+
+copy:do only not changin so often
+
+    cd worker
+    cat Dockerfile
+
+how to create windows image on linux?
+    run base image of windows
+why windows: some application need to deploy on windows.
+
+arg : like variables
+csproj: artifact
+only copy from applicn
+
+
+seed:if data is present we can understand its working
+docker compose --profile seed up -d
+What It Does:
+docker compose → Runs Docker Compose.
+--profile seed → Activates the profile named seed in the docker-compose.yml file.
+up -d → Starts the containers in detached mode (running in the background).
+
+
+
+docker compose up -d 
+       pulling ,-> dependencies
+       Docker starts containers based on dependencies.
+       Each container runs its ENTRYPOINT or CMD
+       If health checks are defined, Docker waits until services are healthy.
+docker ps
+check port of voting app and result
+curl localhost:8080
