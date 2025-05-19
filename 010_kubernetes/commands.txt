@@ -1,0 +1,1274 @@
+day1
+
+ kubectl run newpod --image=nginx
+
+ 101 kubectl gey pod
+
+ 102 kubectl get pod
+
+ 103 kubectl describe newpod
+
+ 104 kubectl describe pod newpod
+
+ 105 kubectl get pods -n kube-system
+
+ 106 curl 172.16.77.133
+
+ 107 cd docker-k8s/
+
+ 108 cd ..
+
+ 109 kubectl patch serviceaccount default -p '{"imagePullSecrets": [{"name": "regcred"}]}'
+
+ 110 cd docker-k8s/
+
+ 111 cd yaml/deployment/
+
+ 112 ls
+
+ 113 cat ng-pod.yaml
+
+ 114 kubectl apply -f ng-pod.yaml
+
+ 115 kubectl get pod
+
+ 116 kubectl get pod newpod yaml
+
+ 117 kubectl get pod newpod -o yaml
+
+ 118 kubectl get pod newpod -o yaml > newpod.yaml
+
+ 119 ls
+
+ 120 nano newpod.yaml
+
+ 121 kubectl run newpod2 --image=nginx --dry-run=client -o yaml > newpod1.yaml
+
+ 122 ls
+
+ 123 nano newpod1.yaml
+
+ 124 cat replica-set.yaml
+
+ 125 kubectl api-resources |grep -i replicaset
+
+ 126 nano replica-set.yaml
+
+ 127 kubectl apply -f replica-set.yaml
+
+ 128 kubectl delete pod --all
+
+ 129 nano replica-set.yaml
+
+ 130 kubectl get secrets
+
+ 131 kubectl get ns
+
+ 132 nano replica-set.yaml
+
+ 133 kubectl get secrets -n kube-system
+
+ 134 kubectl get secrets
+
+ 135 kubectl get secrets -n default
+
+ 139 kubectl get pod
+
+ 140 kubectl get pod -o kube-system
+
+ 141 kubectl get pod -n kube-system
+
+ 142 nano replica-set.yaml
+
+ 143 kubectl apply -f replica-set.yaml
+
+ 144 kubectl edit rs frontend
+
+ 145 kubectl scale rs frontend --replicas=3
+
+ 146 nano replica-set.yaml
+
+ 147 kubectl get pod -o wide
+
+ 148 kubectl scale rs frontend --replicas=5
+
+ 149 kubectl get pod -o wide
+
+ 150 kubectl delete pod --all
+
+ 151 kubectl get pod -o wide
+
+ 152 kubectl delete rs --all
+
+ 153 ls
+
+ 154 cat deploy-ng.yaml
+
+ 155 kubectl apply -f deploy-ng.yaml
+
+ 156 kubectl get pod
+
+ 157 kubectl get deploy rs,pod
+
+ 158 kubectl get deploy
+
+ 159 kubectl describe deploy nginx-deployement
+
+ 160 kubectl describe deploy nginx-deployment
+
+ 161 kubectl rollout status deploy nginx-deployment
+
+ 162 kubectl scale deploy nginx-deployment --replicas=5
+
+ 163 kubectl set image deploy nginx-deployment nginx=nginx:1.16.1
+
+ 164 kubectl describe pod nginx-deployment-8d94c585f-4rmkz
+
+ 165 kubectl rollout history deploy nginx-deployment
+
+ 166 kubectl annotate deploy nginx-deployment kubernetes.io/change-cause="upgraded from failing version 1.9.1 to 1.16.1"
+
+ 167 kubectl rollout history deploy nginx-deployment
+
+
+
+---label and name spaces-----
+
+
+
+ kubectl apply -f label-selector.yaml
+
+ 22 kubectl get pod
+
+ 23 kubectl get pod -l env=development
+
+ 24 kubectl get ns
+
+ 25 kubectl create ns vnyns
+
+ 26 kubectl run pod -n vnyns --image=nginx
+
+ 27 kubectl get po
+
+ 28 kubectl get po -n vnyns
+
+------rolling update-------
+
+ kubectl scale deploy nginx-deployment --replicas=5
+
+ 47 kubectl set image deploy nginx-deployment nginx=nginx:1.16.1
+
+ 48 kubectl describe pod nginx-deployment-8d94c585f-c9jdq
+
+ 49 kubectl set image deploy nginx-deployment nginx=nginx:1.16.1
+
+ 50 kubectl set image deploy nginx-deployment nginx=nginx:1.18.1
+
+ 51 kubectl set image deploy nginx-deployment nginx=nginx:1.20.1
+
+ 52 kubectl rollout history deploy nginx-deployment
+
+ 53 kubectl annotate deploy nginx-deployment kubernetes.io/change-cause="upgra ded from failing version 1.18.1 to 1.20.1"
+
+ 54 kubectl rollout history deploy nginx-deployment
+
+
+
+
+
+https://github.com/vilasvarghese/docker-k8s/blob/master/yaml/ingress/simple/instructions.txt
+
+
+
+--------------------------------------------------------------------------------
+hostnamectl set-hostname kmaster
+    2  hostname
+    3  cat <<EOF | sudo tee /etc/modules-load.d/k8s.conf
+    4  overlay
+    5  br_netfilter
+    6  EOF
+    7  sudo modprobe overlay
+    8  sudo modprobe br_netfilter
+    9  cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
+   10  net.bridge.bridge-nf-call-iptables = 1
+   11  net.bridge.bridge-nf-call-ip6tables = 1
+   12  net.ipv4.ip_forward = 1
+   13  EOF
+   14  sudo sysctl --system
+   15  sudo swapoff -a
+   16  (crontab -l 2>/dev/null; echo "@reboot /sbin/swapoff -a") | crontab - || true
+   17  sudo apt-get update -y
+   18  sudo apt-get install -y software-properties-common gpg curl apt-transport-https ca-certificates
+   19  curl -fsSL https://pkgs.k8s.io/addons:/cri-o:/prerelease:/main/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/cri-o-apt-keyring.gpg
+   20  echo "deb [signed-by=/etc/apt/keyrings/cri-o-apt-keyring.gpg] https://pkgs.k8s.io/addons:/cri-o:/prerelease:/main/deb/ /" | tee /etc/apt/sources.list.d/cri-o.list
+   21  sudo apt-get update -y
+   22  sudo apt-get install -y cri-o
+   23  sudo systemctl daemon-reload
+   24  sudo systemctl enable crio --now
+   25  sudo systemctl start crio.service
+   26  systemctl status crio
+   27  systemctl start crio
+   28  VERSION="v1.32.0"
+   29  wget https://github.com/kubernetes-sigs/cri-tools/releases/download/$VERSION/crictl-$VERSION-linux-amd64.tar.gz
+   30  sudo tar zxvf crictl-$VERSION-linux-amd64.tar.gz -C /usr/local/bin
+   31  rm -f crictl-$VERSION-linux-amd64.tar.gz
+   32  KUBERNETES_VERSION=1.32
+   33  curl -fsSL https://pkgs.k8s.io/core:/stable:/v$KUBERNETES_VERSION/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+   34  echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v$KUBERNETES_VERSION/deb/ /" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+   35  apt update -y
+   36  sudo apt-get install -y kubelet kubeadm kubectl
+   37  kubedm version
+   38  kubeadm version
+   39  kubelet version
+   40  kubectl version
+   41  kubeadm init
+   42  kubeadm reset
+   43  kubeamd init
+   44  kubeadm init
+   45  kubectl get nodes
+   46  kubectl apply -f https://github.com/weaveworks/weave/releases/download/v2.8.1/weave-daemonset-k8s.yaml
+   47  watch -n 1 kubectl get po -o wide
+   48  watch -n 1 kubectl get pds -n kube-system
+   49  watch -n 1 kubectl get pods -n kube-system
+   50  hostnamectl set-hostname kmaster
+   51  hostname
+   52  kubectl get nodes
+   53  watch -n 1 kubectl get pods -n kube-system
+   54  kubectl get nodes
+   55  watch -n 1 kubectl get pods -n kbe-system
+   56  watch -n 1 kubectl get pods -n kube-system
+   57  hostname
+   58  cd 
+   59  kubectl get nodes
+   60  kubectl top node
+   61  kubectl top pod
+   62  git clone https://github.com/vilasvarghese/docker-k8s
+   63  cd docker-k8s/yaml/metricServer/
+   64  kubectl apply -f metric-server.yaml 
+   65  vi metric-server.yaml 
+   66  kubectl top node
+   67  kubectl top node -n kube-system
+   68  kubectl top pod
+   69  kubectl top pod -n kube-system
+   70  vi deployment.yaml
+   71  kubectl apply -f deployment.yml
+   72  kubectl apply -f deployment.yaml
+   73  kubectl get deploy
+   74  vi service.yaml
+   75  kubectl apply -f service.yaml
+   76  kubectl get svc
+   77  vi hpa.yaml
+   78  kubectl apply -f hpa.yaml
+   79  watch -n 1 kubectl get hpa
+   80  kubectl get deploy,svc,hpa
+   81  kubectl run -i --tty load-generator --rm --image=busybox --restart=Never -- /bin/sh -c "while sleep 0.01; do wget -q -O- http://hpa-demo-deployment; done"
+   82  kubectl get hpa
+   83  kubectl top pod
+   84  watch -n 1 kubectl get pod
+   85  watch -n 1 kubectl top pod
+   86  alias k=kubectll
+   87  k get pod -o wide
+   88  alias k=kubectl
+   89  k get pod -o wide
+   90  k get node
+   91  cd docker-k8s/yaml/scheduling/
+   92  ls
+   93  vi ScheduleWithNodeName.yml 
+   94  kubectl apply -f ScheduleWithNodeName.yml 
+   95  k get pod -o wide
+   96  k get po -o wide
+   97  ls
+   98  kubectl apply -f ScheduleWithNodeName.yml 
+   99  kubectl get po -o wide
+  100  kubectl describe po nginx
+  101  vi ScheduleWithNodeName.yml 
+  102  kubectl get node
+  103  hostname
+  104  vi ScheduleWithNodeName.yml 
+  105  kubectl apply -f ScheduleWithNodeName.yml 
+  106  kubectl get po -o wide
+  107  vi ScheduleWithNodeName.yml 
+  108  kubectl apply -f ScheduleWithNodeName.yml 
+  109  kubect delete pod nginx
+  110  kubectl apply -f ScheduleWithNodeName.yml 
+  111  vi ScheduleWithNodeName.yml 
+  112  kubectl apply -f ScheduleWithNodeName.yml 
+  113  k delete pod nginx
+  114  kubectl apply -f ScheduleWithNodeName.yml 
+  115  kubectl get po -o wide
+  116  ls
+  117  vi NodeSelector.yml 
+  118  k apply -f NodeSelector.yml 
+  119  k get pod -o wide
+  120  vi NodeSelector.yml 
+  121  k label nodes ip-172-31-39-119 employee=abhirami
+  122  k apply -f NodeSelector.yml 
+  123  kubectl delete pod cuda-test
+  124  vi NodeSelector.yml 
+  125  k apply -f NodeSelector.yml 
+  126  k get pod -o wide
+  127  k delete po --all
+  128  k get pod -o wide
+  129  sudo su
+  130  kubectl get nodes
+  131  kubectl taint nodes ip-172-31-39-119 app=DBNode:NoSchedule
+  132  k describe ip-172-31-39-119
+  133  kubectl describe node ip-172-31-39-119
+  134  cd docker-k8s/yaml/scheduling/
+  135  kubectl describe node ip-172-31-39-119
+  136  ls
+  137  kubectl apply -f taintsAndTolerations/PodWithTolerations.yaml 
+  138  kubectl get po -o wide
+  139  history
+  140  kubectl get nodes
+  141  kubectl secribe node ip-172-31-36-90 | grep Taint
+  142  kubectl decribe node ip-172-31-36-90 | grep Taint
+  143  kubectl describe node ip-172-31-36-90 | grep Taint
+  144  kubectl describe node ip-172-31-36-90 | grep -i Taint
+  145  kubectl describe node ip-172-31-36-90 | grep -i taint
+  146  kubectle get nodes
+  147  kubectl get nodes
+  148  kubectl describe node ip-172-31-46-172 | grep -i taint
+  149  LS
+  150  ls
+  151  cd taintsAndTolerations/
+  152  ls
+  153  vi PodWithTolerations.yaml 
+  154  kubectl apply -f PodWithTolerations.yaml 
+  155  kubectl delete pod nginx
+  156  kubectl apply -f PodWithTolerations.yaml
+  157  kubectl get pods -o wide
+  158  ~kubectl get pods -o wide
+  159  kubectl get pods -o wide
+  160  cd ..
+  161  kubectl taint nodes ip-172-31-39-119 app=DBNode:NoSchedule
+  162  kubectl taint nodes ip-172-31-39-119 app=DBNode:NoSchedule-
+  163  kubectl get pod -o wide
+  164  history
+  165  kubectl get pod -o wide
+  166  kubectl get nodes
+  167  kubectl describe node ip-172-31-36-90 | grep Taint
+  168  kubectl taint nodes ip-172-31-36-90 app=DBNode:NoSchedule
+  169  kubectl describe node ip-172-31-36-90 | grep Taint
+  170  kubectl delete pod nginx
+  171  kubectl apply -f taintsAndTolerations/PodWithTolerations.yaml 
+  172  kubectl get pods
+  173  kubectl get pods -o wide
+  174  cat taintsAndTolerations/PodWithTolerations.yaml 
+  175  kubectl get nodes
+  176  kubectl describe node ip-172-31-39-119 | grep -i taint
+  177  kubectl taint nodes ip-172-31-39-119 app=DBNode:NoSchedule
+  178  kubectl describe node ip-172-31-39-119 | grep -i taint
+  179  kubectl delete pod nginx
+  180  kubectl apply -f taintsAndTolerations/PodWithTolerations.yaml 
+  181  kubectl get pods
+  182  kubectl get pods -o wide
+  183  kubectl describe node ip-172-31-39-119 | grep -i taint
+  184  cat taintsAndTolerations/PodWithTolerations.yaml 
+  185  kubectl get pods -o wide
+  186  cd ..
+  187  cd jobs
+  188  ls
+  189  cd job/
+  190  ls
+  191  cat job.yaml 
+  192  kubectl logs countdown-9tmxf
+  193  kubectl get pod -o wide
+  194* 
+  195  kubectl get pod -o wide
+  196  kubectl logs countdown-sdds6
+  197  kubectl get pod -o wide
+  198  kubectl get job
+  199  ls
+  200  kubectl get pod -o wide
+  201  kubectl describe pod countdown-sdds6
+  202  kubectl taint nodes kworker1 app=DBNode:NoSchedule-
+  203  kubectl get nodes
+  204  kubectl taint nodes ip-172-31-46-172 app=DBNode:NoSchedule-
+  205  kubectl taint nodes ip-172-31-39-119 app=DBNode:NoSchedule-
+  206  kubectl taint nodes ip-172-31-36-90 app=DBNode:NoSchedule-
+  207  kubectl get nodes
+  208  kubectl get pod -o wide
+  209  kubectl delete pod countdown-sdds6
+  210  kubectl apply -f job.yaml 
+  211  kubectl get pod -o wide
+  212  kubectl create -f job.yaml 
+  213  kubectl delete jobs --all
+  214  kubectl create -f job.yaml 
+  215  kubectl get pod -o wide
+  216  kubectl get jobs
+  217  ls
+  218  cat cronejob.yaml
+  219  cat cronjob.yaml 
+  220  kubectl apply -f cronjob.yaml 
+  221  kubectl get pods -o wide
+  222  watch -n 1 get pods -o wide
+  223  watch -n 1 get pods
+  224  history
+  ---------------------------------------------------------------------
+
+day 3
+RBAC
+
+git clone https://github.com/vilasvarghese/docker-k8s
+
+  47 ls
+
+  48 export MAGIC_USER=dicktracy
+
+  49 echo $MAGIC_USER
+
+  50 openssl genrsa -out dicktracy.key 2048
+
+  51 ls
+
+  52 cat dicktracy.key
+
+  53 openssl req -new -key dicktracy.key -out dicktracy.csr -subj "/CN=${MAGIC_USER}/O=devs/O=tech-leads
+
+  54 openssl req -new -key dicktracy.key -out dicktracy.csr -subj "/CN=${MAGIC_USER}/O=devs/O=tech-leads"
+
+  55 ls
+
+  56 cat dicktracy.csr
+
+  57 sudo openssl x509 -req -in dicktracy.csr -CA /etc/kubernetes/pki/ca.crt -CAkey /etc/kubernetes/pki/ca.key -CAcreateserial -out dicktracy.crt -days 500
+
+  58 ls
+
+  59 cat dicktracy.crt
+
+  60 mkdir -p $HOME/.certs && mv dicktracy.crt dicktracy.key $HOME/.certs
+
+  61 cd $HOME
+
+  62 cd ~/$HOME/.cert
+
+  63 cd ~/$HOME/.certs
+
+  64 ls
+
+  65 cd ..
+
+  66 ls
+
+  67 cd ~/$HOME/.certs
+
+  68 ls -a
+
+  69 cd ~
+
+  70 ls
+
+  71 cd docker-k8s/yaml/rbac/
+
+  72 ls
+
+  73 cat namespaces.yaml
+
+  74 kubectl apply -f namespaces.yaml
+
+  75 kubectl get pod,ns
+
+  76 kubectl config view
+
+  77 kubectl config get-contexts
+
+  78 kubectl config set-credentials ${MAGIC_USER}@kubernetes --client-certificate=$HOME/.certs/${MAGIC_USER}.crt --client-key=$HOME/.certs/${MAGIC_USER}.key --embed-certs=true
+
+  79 kubectl config view
+
+  80 kubectl config get-contexts
+
+  81 kubectl config set-context ${MAGIC_USER}@kubernetes --cluster=kubernetes --user=${MAGIC_USER}@kubernetes
+
+  82 kubectl config get-contexts
+
+  83 ls
+
+  84 vi pod-reader.yaml
+
+  85 kubectl apply -f pod-reader.yaml
+
+  86 kubectl get role -n test
+
+  87 cat user-pod-reader-rolebinding.yaml
+
+  88 kubectl apply -f user-pod-reader-rolebinding.yaml
+
+  89 nano user-pod-reader-rolebinding.yaml
+
+  90 kubectl apply -f user-pod-reader-rolebinding.yaml
+
+  91 kubectl kubectl get rolebinding -n test
+
+  92 kubectl get rolebinding -n test
+
+  93 kubectl run npod --image=nginx -n test
+
+  94 kubectl get pod -n test
+
+  95 kubectl describe pod npod
+
+  96 kubectl describe node kmaster
+
+  97 kubectl describe node kmaster |taint
+
+  98 kubectl describe node kmaster |grep taint
+
+  99 kubectl describe node kmaster | grep "taint"
+
+ 100 kubectl describe node kmaster | grep "Taint"
+
+ 101 kubectl taint nodes kmaster node-role.kubernetes.io/control-plane:NoSchedule-
+
+ 102 kubectl get pod -n test
+
+ 103 kubectl auth can-i list pods -n test --as dicktracy@kubernetes
+
+ 104 kubectl auth can-i list pods -n test --as kubernetes-admin@kubernet
+
+ 105 kubectl config use-context ${MAGIC_USER}@kubernet
+
+ 106 kubectl config get-context
+
+ 107 kubectl config get-contexts
+
+ 108 kubectl auth can-i list pods -n test --as dicktracy
+
+ 109 kubectl auth can-i list pods -n test --as dicktracy@kubernetes
+
+ 110 kubectl get pod -n test
+
+ 111 kubectl run newpod --image=nginx -n test
+
+ 112 kubect list pod -n test
+
+ 113 kubectl list pod -n test
+
+ 114 kubectl config use-context kubernetes-admin@kubernetes
+
+ 115 kubectl auth can-i list pods -n test --as dicktracy
+
+ 116 ls
+
+ 117 nano simple-dev-role.yaml
+
+ 118 kubectl apply -f simple-dev-role.yaml
+
+ 119 nano simple-dev-role.yaml
+
+ 120 kubectl apply -f simple-dev-role.yaml
+
+ 121 kubectl get role -n devs
+
+ 122 nano simple-dev-rolebinding.yaml
+
+ 123 kubectl apply -f simple-dev-rolebinding.yaml
+
+ 124 kubectl get rolebinding -n devs
+
+ 125 kubectl config use-contexts dicktracy@kubernetes
+
+ 126 kubectl config use-context dicktracy@kubernetes
+
+ 127 kubectl run newpod --image=nginx -n devs
+
+ 128 kubectl get pod -n devs
+
+ 129 vi simple-dev-role.yaml
+
+ 130 cd ..
+
+ 131 ls
+
+ 132 cd serviceAccount/
+
+ 133 ls
+
+ 134 kubectl create deployment nginx1 --image=nginx
+
+ 135 kubectl config use-context kubernetes-admin@kubernetes
+
+ 136 kubectl create deployment nginx1 --image=nginx
+
+ 137 kubectl get deploy
+
+ 138 kubectl get pod
+
+ 139 kubectl describe pod nginx1-b7c99b5c8-hm5tj
+
+ 140 kubectl exec -it nginx1-b7c99b5c8-hm5tj -- /bin/bash
+
+ 141 kubectl et serviceaccount
+
+ 142 kubectl get serviceaccount
+
+ 143 kubectl create rolebinding nginx-sa-readonly --clusterrole=view --serviceaccount=default:nginx-serviceaccount --namespace=default
+
+ 144 ls
+
+ 145 cat dep.yaml
+
+ 146 kubectl apply -f dep.yaml
+
+ 147 kubectl get pod
+
+ 148 hostnamectl set-hostname kmaster
+
+ 149 sudo su
+
+ 150 cd docker-k8s/yaml/serviceAccount/
+
+ 151 kubectl get deploy,pod
+
+ 152 kubectl exec -it pod/nginx-deployment-78f76d5775-k4mtd --/bin/bash
+
+ 153 kubectl exec -it pod/nginx-deployment-78f76d5775-k4mtd -- /bin/bash
+
+ 154 ls
+
+ 155 cd docker-k8s/yaml/
+
+ 156 ccd secrets
+
+ 157 cd secrets/
+
+ 158 ls
+
+ 159 kubectl create secret generic test --from
+
+ 160 echo "admin" > username.txt
+
+ 161 echo "password" > password.txt
+
+ 162 cat username.txt
+
+ 163 cat password.txt
+
+ 164 kubectl create secret generic test --from-file=./username.txt --from-file=./password.txt
+
+ 165 kubectl get secret
+
+ 166 kubectl describe secret test
+
+ 167 cat secrets.yaml
+
+ 168 echo -n 'admin'|base64
+
+ 169 echo bXlwYXNzd29yZA== |base64 --decode
+
+ 170 kubectl apply -f secrets.yaml
+
+ 171 kubectl get secrets
+
+ 172 echo -n 'password'|base64
+
+ 173 kubectl get secret test -o yaml > examplesecret.yaml
+
+ 174 cat examplesecret.yaml
+
+ 175 cat secrets-env-pod.yaml
+
+ 176 kubectl describe secrets.yaml
+
+ 177 kubectl describe secret mysecret
+
+ 178 kubectl apply -f secrets-env-pod.yaml
+
+ 179 kubectl get pod
+
+ 180 kubectl exec -it secret-env-pod -- /bin/bash
+
+ 181 cat secrets-use.yaml
+
+ 182 kubectl apply -f secrets-use.yaml
+
+ 183 kubectl get pod
+
+ 184 kubectl exec -it mysecret-pod -- /bin/bash
+
+  1 cd /etc/foo
+
+  2 ls
+
+  3 cat user
+
+  4 cat password
+
+ 186 cd ..
+
+ 187 cd configmap/simple/
+
+ 188 ls
+
+ 189 cat configmap.yml
+
+ 190 kubectl apply -f configmap.yml
+
+ 191 kubectl get cm
+
+ 192 kubectl describe cm example-configmap
+
+ 193 cat pod-with-config-map.yml
+
+ 194 kubectl get pod
+
+ 195 kubectl apply -f pod-with-config-map.yml
+
+ 196 kubectl get pod
+
+ 197 kubectl exec -it example-pod -- /bin/bash
+
+ 198 cd ..
+
+ 199 cd volumes/
+
+ 200 ls
+
+ 201 cd empty-dir.yaml
+
+ 202 cat empty-dir.yaml
+
+ 203 kubectl apply -f empty-dir.yaml
+
+ 204 kubectl get pod
+
+ 205 kubectl exec -it my-empty-dir -c test-container-1 -- /bin/ash
+
+ 206 cd docker-k8s/yaml/volumes/
+
+ 207 ls
+
+ 208 kubectl get pod
+
+ 209 kubectl exec -it my-empty-dir -c test-container-1 -- /bin/ash
+
+ 210 cat host-path.yaml
+
+ 211 kubectl get pod
+
+ 212 kubectl apply -f host-path.yaml
+
+ 213 kubectl get pod
+
+ 214 kubectl exec -it redis-hostpath -- /bin/bash
+
+  1 cd /test-mnt/
+
+  4 touch abc.txt
+
+  5 ls
+
+  6 history
+  ---------------------------------------------------------
+20/3/2025
+
+  cd docker-k8s/yaml/volumes/
+   52  ls
+   53  cat persistent-volume.yaml 
+   54  kubectl apply -f persistent-volume.yaml 
+   55  kubectl get pv
+   56  cat persistent-volume-claim.yaml 
+   57  kubectl apply -f persistent-volume-claim.yaml 
+   58  kubectl get pvc
+   59  kubectl get pv
+   60  ls
+   61  cat persistent-volume-pod.yaml 
+   62  kubectl apply -f persistent-volume-pod.yaml 
+   63  kubectl get pv-pod
+   64  kubectl get pod
+   65  kubectl exec -it pv-pod -- /bin/ash
+   66  cd docker-k8s/yaml/volumes/
+   67  kubectl get pods
+   68  kubectl exec -it pv-pod -- /bin/bash
+   69  kubectl exec -it pv-pod -- /bin/ash
+   70  clear
+   71  kubectl delete pv --all
+   72  kubectl get po
+   73  kubectl get pvc
+   74  kubectl get pv
+   75  kubectl delete po --all
+   76  kubectl get pv
+   77  kubectl get pvc
+   78  kubectl delete pvc --all
+   79  kubectl get pvc
+   80  kubectl get pv
+   81  kubectl get nodes
+   82  kubectl describe node kmaster | grep -i taint
+   83  kubectl taint node kmaster node-role.kubernetes.io/control-plane:NoSchedule-
+   84  kubectl get nodes
+   85  ]
+   86  nano liveliness.yaml
+   87  kubectl apply -f liveliness.yaml 
+   88  kubectl get pods
+   89  kubectl describe pod liveness-exec
+   90  nano readliness.yaml
+   91  kubectl apply -f readliness.yaml 
+   92  kubectl get pods
+   93  kubectl describe pod goproxy
+   94  nano readliness.yaml
+   95  nano liveliness.yaml
+   96  nano readliness.yaml
+   97  kubectl apply -f readliness.yaml 
+   98  kubectl get pods
+   99  kubectl describe pod readylines-exec
+  100  nano readliness.yaml
+  101  kubectl apply -f readliness.yaml 
+  102  kubectl get pods
+  103  kubectl delete pod readylines-exec
+  104  kubectl apply -f readliness.yaml 
+  105  kubectl get pods
+  106  kubectl describe pod readylines-exec
+  107  kubectl get pods
+  108  kubectl run beforebackup --image=nginx
+  109  kubectl get pod
+  110  etcdctl
+  111  apt  install etcd-client  
+  112  ETCDCTL_API=3 etcdctl            --endpoints=https://[127.0.0.1]:2379            --cacert=/etc/kubernetes/pki/etcd/ca.crt                --cert=/etc/kubernetes/pki/etcd/server.crt               --key=/etc/kubernetes/pki/etcd/server.key               member list
+  113  cd etc
+  114  cd /etc
+  115  cd/kubernetes
+  116  cd kubernetes/manifests/
+  117  ls
+  118  cat etcd.yaml
+  119  ETCDCTL_API=3 etcdctl            --endpoints=https://127.0.0.1:2379              --cacert=/etc/kubernetes/pki/etcd/ca.crt                --cert=/etc/kubernetes/pki/etcd/server.crt               --key=/etc/kubernetes/pki/etcd/server.key snapshot save /tmp/snapshot.db 
+  120  cd /tmp/
+  121  ls
+  122  cat snapshot.db 
+  123  cd /etc
+  124  cd kubernetes/manifests/
+  125  ls
+  126  history
+  127  ETCDCTL_API=3 etcdctl            --endpoints=https://127.0.0.1:2379              --cacert=/etc/kubernetes/pki/etcd/ca.crt                --cert=/etc/kubernetes/pki/etcd/server.crt               --key=/etc/kubernetes/pki/etcd/server.key snapshot status /tmp/snapshot.db 
+  128  cd
+  129  kubectl run afterbackup --image=nginx
+  130  kubectl get pod
+  131  kubectl delete pod beforebackup
+  132  ETCDCTL_API=3 etcdctl            --endpoints=https://127.0.0.1:2379              --cacert=/etc/kubernetes/pki/etcd/ca.crt                --cert=/etc/kubernetes/pki/etcd/server.crt               --key=/etc/kubernetes/pki/etcd/server.key --data-dir=/var/lib/etcd.dir snapshot restore /tmp/snapshot.db 
+  133  kubectl get pod
+  134  mv /var/lib/etcd /var/lib/etcd/etcd-backup
+  135  mv /var/lib/etcd /var/lib/etcd-backup
+  136  kubectl get po
+  137  ls
+  138  mv /var/lib/etcd.dir /var/lib/etcd
+  139  kubectl get po -o wide
+  140  kubectl get po -n kube-system
+  141  kubectl delete pod etcd-kmaster -n kube-system
+  142  cd 
+  143  cd /home/ubuntu/
+  144  cd /etc/kubernetes/manifests/
+  145  ls
+  146  cd 
+  147  cd /home/ubuntu/
+  148  cd /var/lib/
+  149  ls
+  150  etcdutl --data-dir /var/lib/etcd snapshot restore /tmp/snapshot.db
+  151  hstory
+  152  history
+
+---------------------------
+etcd backup - done
+
+ETCDCTL_API=3 etcdctl            --endpoints=https://127.0.0.1:2379              --cacert=/etc/kubernetes/pki/etcd/ca.crt                --cert=/etc/kubernetes/pki/etcd/server.crt               --key=/etc/kubernetes/pki/etcd/server.key snapshot status /tmp/snapshot.db 
+  128  cd
+  129  kubectl run afterbackup --image=nginx
+  130  kubectl get pod
+  131  kubectl delete pod beforebackup
+  132  ETCDCTL_API=3 etcdctl            --endpoints=https://127.0.0.1:2379              --cacert=/etc/kubernetes/pki/etcd/ca.crt                --cert=/etc/kubernetes/pki/etcd/server.crt               --key=/etc/kubernetes/pki/etcd/server.key --data-dir=/var/lib/etcd.dir snapshot restore /tmp/snapshot.db 
+  133  kubectl get pod
+  134  mv /var/lib/etcd /var/lib/etcd/etcd-backup
+  135  mv /var/lib/etcd /var/lib/etcd-backup
+  136  kubectl get po
+  137  ls
+  138  mv /var/lib/etcd.dir /var/lib/etcd
+  139  kubectl get po -o wide
+  140  kubectl get po -n kube-system
+  141  kubectl delete pod etcd-kmaster -n kube-system
+  142  cd 
+  143  cd /home/ubuntu/
+  144  cd /etc/kubernetes/manifests/
+  145  ls
+  146  cd 
+  147  cd /home/ubuntu/
+  148  cd /var/lib/
+  149  ls
+  150  etcdutl --data-dir /var/lib/etcd snapshot restore /tmp/snapshot.db
+  151  hstory
+  152  history
+  153  cd
+  154  cd /home/ubuntu/
+  155  cd /var/lib/
+  156  ls
+  157  ETCDCTL_API=3 etcdctl            --endpoints=https://127.0.0.1:2379              --cacert=/etc/kubernetes/pki/etcd/ca.crt                --cert=/etc/kubernetes/pki/etcd/server.crt               --key=/etc/kubernetes/pki/etcd/server.key --data-dir=/var/lib/etcd.dir snapshot restore /tmp/snapshot.db 
+  158  ls
+  159  cd /etc/kubernetes/manifests/
+  160  kubectl get po
+  161  mv etcd.yaml /tmp/etcd.yaml
+  162  mv /tmp/etcd.yaml .
+  163  kubectl get po
+  164  watch -n 1 get po 
+  165  vi etcd.yaml 
+  166  cd /var/lib/
+  167  ls
+  168  cd -
+  169  vi etcd.yaml 
+  170  watch -n 1 kubectl get po
+  171  ls
+  172  kubectl get po
+  173  history
+
+  ---------------------------------------------------------------------------------
+  21/3/25
+
+   clear
+    2  cd 
+    3  clear
+    4  cat <<EOF | sudo tee /etc/modules-load.d/k8s.conf
+    5  overlay
+    6  br_netfilter
+    7  EOF
+    8  sudo modprobe overlay
+    9  sudo modprobe br_netfilter
+   10  cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
+   11  net.bridge.bridge-nf-call-iptables  = 1
+   12  net.bridge.bridge-nf-call-ip6tables = 1
+   13  net.ipv4.ip_forward                 = 1
+   14  EOF
+   15  sudo sysctl --system
+   16  sudo swapoff -a
+   17  (crontab -l 2>/dev/null; echo "@reboot /sbin/swapoff -a") | crontab - || true
+   18  sudo apt-get update -y
+   19  sudo apt-get install -y software-properties-common gpg curl apt-transport-https ca-certificates
+   20  curl -fsSL https://pkgs.k8s.io/addons:/cri-o:/prerelease:/main/deb/Release.key |
+   21  curl -fsSL https://pkgs.k8s.io/addons:/cri-o:/prerelease:/main/deb/Release.key |     gpg --dearmor -o /etc/apt/keyrings/cri-o-apt-keyring.gpg
+   22  echo "deb [signed-by=/etc/apt/keyrings/cri-o-apt-keyring.gpg] https://pkgs.k8s.io/addons:/cri-o:/prerelease:/main/deb/ /" |     tee /etc/apt/sources.list.d/cri-o.list
+   23  sudo apt-get update -y
+   24  sudo apt-get install -y cri-o
+   25  sudo systemctl daemon-reload
+   26  sudo systemctl enable crio --now
+   27  sudo systemctl start crio.service
+   28  wget https://github.com/kubernetes-sigs/cri-tools/releases/download/$VERSION/crictl-$VERSION-linux-amd64.tar.gz
+   29  sudo tar zxvf crictl-$VERSION-linux-amd64.tar.gz -C /usr/local/bin
+   30  rm -f crictl-$VERSION-linux-amd64.tar.gz
+   31  KUBERNETES_VERSION=1.31
+   32  sudo apt-get update -y
+   33  apt-cache madison kubeadm | tac
+   34  sudo apt-get install -y kubelet=1.31.7-1.1 kubectl=1.31.7-1.1 kubeadm=1.31.7-1.1
+   35  sudo apt-mark hold kubelet kubeadm kubectl
+   36  sudo apt-get install -y jq
+   37  KUBELET_EXTRA_ARGS=--node-ip=$local_ip
+   38  EOF
+   39  hostname
+   40  export KUBECONFIG=/etc/kubernetes/admin.conf
+   41  kubectl apply -f https://github.com/weaveworks/weave/releases/download/v2.8.1/weave-daemonset-k8s.yaml
+   42  kubectl get nodes
+   43  kubectl describe node master | grep -i taint
+   44  kubectl taint node master node-role.kubernetes.io/control-plane:NoSchedule-
+   45  kubectl apply -f https://github.com/weaveworks/weave/releases/download/v2.8.1/weave-daemonset-k8s.yaml
+   46  kubectl run mypod --image=nginx
+   47  kubectl get pods
+   48  sudo apt update
+   49  sudo apt-cache madison kubeadm
+   50  KUBERNETES_VERSION=1.32
+   51  sudo mkdir -p /etc/apt/keyrings
+   52  curl -fsSL https://pkgs.k8s.io/core:/stable:/v$KUBERNETES_VERSION/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+   53  echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v$KUBERNETES_VERSION/deb/ /" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+   54  history
+   55  sudo apt-get update -y
+   56  sudo apt-mark unhold kubeadm && sudo apt-get update && sudo apt-get install -y kubeadm='1.32.3-1.1' && sudo apt-mark hold kubeadm
+   57  kubectl get pods
+   58  kubeadm --v
+   59  kubeadm --version
+   60  kubeadm version
+   61  kubectl drain master --ignore-daemonset
+   62  kubectl drain master --ignore-daemonsets
+   63  kubectl drain master --ignore-daemonsets --force
+   64  killall -s SIGTERM kube-apiserver && sleep 20
+   65  sudo kubeadm upgrade plan
+   66  kubeadm version
+   67  sudo kubectl upgrade plan
+   68  kubectl upgrade plan
+   69  kubectl upgrade node
+   70  sudo apt-mark unhold kubelet kubectl && sudo apt-get update && sudo apt-get install -y kubelet='1.32.x-*' kubectl='1.32.x-*' && sudo apt-mark hold kubelet kubectl
+   71  sudo kubectl upgrade plan
+   72  sudo apt-cache madison kubectl
+   73  sudo apt-mark unhold kubelet kubectl && sudo apt-get update && sudo apt-get install -y kubelet='1.32.3-1.1' kubectl='1.32.3-1.1' && sudo apt-mark hold kubelet kubectl
+   74  kubectl version
+   75  kubectl get po
+   76  kubectl get po -n kube-system
+   77  kubectl get node
+   78  kubectl version
+   79  sudo systemctl daemon-reload
+   80  sudo systemctl restart kubelet
+   81  kubectl uncordonmaster
+   82  kubectl uncordon master
+   83  kubectl get nodes
+   84  watch -n 1 kubectl get po -n kube-system
+   85  sudo apt-cache madison kubeadm
+   86  kubecrl run nginx --image=nginx
+   87  kubectl run nginx --image=nginx
+   88  watch -n 1 kubectl get po
+   89  kubectl run beforebackup --image=nginx
+   90  kubectl get pods
+   91  etcdctl
+   92  apt  install etcd-client
+   93  cd /etc/kubernetes/manifests/
+   94  ls
+   95  nano etcd.yaml 
+   96  cat etcd.yml
+   97  cat etcd.yaml
+   98  ETCDCTL_API=3 etcdctl --endpoints=https://127.0.0.1:2379   --cacert=/etc/kubernetes/pki/etcd/ca.crt   --cert=/etc/kubernetes/pki/etcd/server.crt   --key=/etc/kubernetes/pki/etcd/server.key snapshot save /tmp/snapshot.db
+   99  cd /tmp/snap
+  100  cd
+  101  cd /tmp
+  102  ls
+  103  kubectl get pods
+  104  ETCDCTL_API=3 etcdctl --endpoints=https://127.0.0.1:2379   --cacert=/etc/kubernetes/pki/etcd/ca.crt   --cert=/etc/kubernetes/pki/etcd/server.crt   --key=/etc/kubernetes/pki/etcd/server.key --data-dir=/var/lib/etcd-backup snapshot restore /tmp/snapshot.db
+  105  cd 
+  106  kubectl get pod
+  107  kbectl delete pod --all
+  108  kubectl delete pod --all
+  109  kubectl run pod --image=nginx
+  110  kubectl get pods
+  111  kubectl run afterbackup --image=nginx
+  112  kubectl get pods
+  113  cd /etc/kubernetes/manifests/
+  114  ls
+  115  nano kube-apiserver.yaml 
+  116  nano etcd.yaml 
+  117  kubectl get pods -n kube-system
+  118  kubectl get po
+  119  cd
+  120  cd ./kube
+  121  cd /etc/var
+  122  cd /etc/
+  123  ls
+  124  kubectl get po
+  125  cd
+  126  ls -a
+  127  cd .kube/
+  128  ls
+  129  cd 
+  130  kubectl get pod --show-labels
+  131  kubectl wait --for=condition-ready pod
+  132  kubectl get pod --help | grep for
+  133  kubectl get pod -ojson | jq'.items[].status'
+  134  apt install jq
+  135  kubectl get pod -ojson | jq'.items[].status'
+  136  kubectl get pod -ojson | 'jq.items[].status'
+  137  jq.status
+  138  jq --help
+  139  kubectl get pod -ojson | jq '.items[].status'
+  140  kubectl config view -o jsonpath='{.users[].name}' 
+  141  ls
+  142  kubectl get pods -o jsonpath="{.items[*].metadata.name}"
+  143  kubectl get pods -o jsonpath="{range .items[*]}{.metadata.name}{'\n'}{end}"
+  144  kubectl get pods -o json | jq '.items[].metadata.name'
+  145  kubectl get pods -o json | jq '.items[] | select(.status.phase=="Running") | .metadata.name'
+  146  kubectl get po -o json
+  147  kubectl get pods -o jsonpath="{.items[*].metadata.name}"
+  148  kubectl run nginx --image=nginx --dry-run=client -o json > pod.json
+  149  ls
+  150  history
+
+crictl ps | grep kube-proxy
+  152  crictl logs 53fa92cba03ce
+
+
+
+----------------------------------------------------
+24/3/25
+
+helm
+
+
+hostnamectl set-hostname kmaster
+    2  hostname
+    3  cat <<EOF | sudo tee /etc/modules-load.d/k8s.conf
+    4  overlay
+    5  br_netfilter
+    6  EOF
+    7  sudo modprobe overlay
+    8  sudo modprobe br_netfilter
+    9  cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
+   10  net.bridge.bridge-nf-call-iptables = 1
+   11  net.bridge.bridge-nf-call-ip6tables = 1
+   12  net.ipv4.ip_forward = 1
+   13  EOF
+   14  sudo sysctl --system
+   15  sudo swapoff -a
+   16  (crontab -l 2>/dev/null; echo "@reboot /sbin/swapoff -a") | crontab - || true
+   17  sudo apt-get update -y
+   18  sudo apt-get install -y software-properties-common gpg curl apt-transport-https ca-certificates
+   19  curl -fsSL https://pkgs.k8s.io/addons:/cri-o:/prerelease:/main/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/cri-o-apt-keyring.gpg
+   20  echo "deb [signed-by=/etc/apt/keyrings/cri-o-apt-keyring.gpg] https://pkgs.k8s.io/addons:/cri-o:/prerelease:/main/deb/ /" | tee /etc/apt/sources.list.d/cri-o.list
+   21  sudo apt-get update -y
+   22  sudo apt-get install -y cri-o
+   23  sudo systemctl daemon-reload
+   24  sudo systemctl enable crio --now
+   25  sudo systemctl start crio.service
+   26  systemctl status crio
+   27  systemctl start crio
+   28  VERSION="v1.32.0"
+   29  wget https://github.com/kubernetes-sigs/cri-tools/releases/download/$VERSION/crictl-$VERSION-linux-amd64.tar.gz
+   30  sudo tar zxvf crictl-$VERSION-linux-amd64.tar.gz -C /usr/local/bin
+   31  rm -f crictl-$VERSION-linux-amd64.tar.gz
+   32  KUBERNETES_VERSION=1.32
+   33  curl -fsSL https://pkgs.k8s.io/core:/stable:/v$KUBERNETES_VERSION/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+   34  echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v$KUBERNETES_VERSION/deb/ /" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+   35  apt update -y
+   36  sudo apt-get install -y kubelet kubeadm kubectl
+   37  kubedm version
+   38  kubeadm version
+   39  kubelet version
+   40  kubectl version
+   41  kubeadm init
+   42  hostnamectl set-hostname-kmaster
+   43  hostnamectl set-hostname kmaster
+   44  hostname
+   45  kubectl reset
+   46  kubeadm reset
+   47  kubeadm init
+   48  mkdir -p $HOME/.kube
+   49  kubectl get nodes
+   50  kubectl apply -f https://github.com/weaveworks/weave/releases/download/v2.8.1/weave-daemonset-k8s.yaml
+   51  kubectl get nodes
+   52  kubectl describe node kmaster
+   53  kubectl get nodes
+   54  curl https://baltocdn.com/helm/signing.asc | gpg --dearmor | sudo tee /usr/share/keyrings/helm.gpg > /dev/null
+   55  sudo apt-get install apt-transport-https --yes
+   56  echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/helm.gpg] https://baltocdn.com/helm/stable/debian/ all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
+   57  sudo apt-get update
+   58  sudo apt-get install helm
+   59  helm create myhelm
+   60  tree
+   61  apt  install tree
+   62  tree myhelm
+   63  cd myhelm/
+   64  ls
+   65  cat Chart.yaml 
+   66  helm create my_chart
+   67  cd my_chart/
+   68  ls
+   69  cat Chart.yaml 
+   70  cd charts/
+   71  ls
+   72  cd ..
+   73  cd templates/
+   74  ls
+   75  cat deployment.yaml 
+   76  cd ../values.yaml 
+   77  cd ..
+   78  cat values.yaml 
+   79  nano values.yaml 
+   80  cd
+   81  helm template my_chart
+   82  ls
+   83  helm template myhelm/
+   84  ls
+   85  helm template myhelm
+   86  helm lint myhelm/
+   87  helm install abhichart myhelm/
+   88  kubectl get all
+   89  cd myhelm/
+   90  ls
+   91  cd my_chart/
+   92  ls
+   93  cat values.yaml 
+   94  nano values.yaml 
+   95  nano Chart.yaml 
+   96  kubectl get all
+   97  kubectl describe pod pod/abhichart-myhelm-756b847c6-w7qd7
+   98  kubectl describe pod abhichart-myhelm-756b847c6-w7qd7
+   99  kubectl describe node kmaster | grep -i taint
+  100  kubectl taint node kmaster node-role.kubernetes.io/control-plane:NoSchedule-
+  101  kubectl get all
+  102  ls
+  103  cd templates/
+  104  ls
+  105  cat ingress.yaml 
+  106  cd
+  107  history
+  ---------------------------------------
+
+  cd /etc/kubernetes/manifests/
+  156  ls
+  157  cat kube-apiserver.yaml | grep range
+  158  cd
+  159  kubectl get pod -n kube-system
+  160  cd /etc/
+  161  ls
+  162  ls cni*
+  163  cd cni
+  164  ls
+  165  cd net.d/
+  166  ls
+  167  cat 10-weave.conflist 
+  168  kubectl get pod -n kube-system
+  169  cd
+  170  kubectl get events --all ns --sort-by=.metadata.creationTimestamp
+  171  kubectl get events -A --all --sort-by=.metadata.creationTimestamp
+  172  kubectl get events -A  --sort-by=.metadata.creationTimestamp
+  173  kubectl get pod -n kube-system
+  174  kubctl describe pod kube-proxy-h2jm4
+  175  kubectl describe pod kube-proxy-h2jm4
+  176  kubectl describe pod kube-proxy-h2jm4 -n kube-system
+  177  kubectl describe pod kube-proxy-h2jm4 -n kube-system | grep -i eve
+  178  kubectl delete pod kube-proxy-h2jm4
+  179  kubectl delete pod kube-proxy-h2jm4 -n kube-system
+  180  kubectl get events
+  181  kubectl get events -n kube-system
+  182  kubectl get pods -n kube-system
+  183  ps -ef | grep runc
+  184  crictl ps | grep kube-proxy
+  185  crictl ps -ef| grep kube-proxy
+  186  ps -ef | grep -i containerd
+  187  kill -9 39513
+  188  clear
+  189  kubectl create ns cka-master
+  190  kubectl get -all
+  191  kubectl get -A
+  192  kubectl get all -A
+  193  kubectl get all -A > abc.txt
+  194  kubectl get roles --all-ns
+  195  kubectl get roles --all-namespaces
+  196  kubectl get roles --all-namespaces -o wide
+  197  cat abc.txt 
+  198  k api-resources --namespaced -o name 
+  199  kubectl api-resources --namespaced -o name 
+  200  kubectl api-resources --help
+  201  kubectl api-resources --namespaced
+  202  kubectl api-resources --namespaced=false
+  203  kubectl api-resources --namespaced=false -o name
+  204  clear
+  205  k get ns 
+  206  clear
+  207  alias k=kubectl
+  208  k get ns
+  209  k run tigers-reunite --image=https:2.4.41-alpine --labels="pod=container" --dry-run=client -o yaml
+  210  vi abc.yamk
+  211  vi tiger.yaml
+  212  k apply -f tiger.yaml -n project-tiger
+  213  k get pod -n project-tiger
+  214  k describe pod tiger.yaml 
+  215  k describe pod tigers-reunit
+  216  k describe pod tigers-reunite
+  217  k describe pod tigers-reunite -n projecr-tiger
+  218  k describe pod tigers-reunite -n project-tiger
+  219  k edit pod tiger.yaml 
+  220  k edit pod tigers-reunite -n project-tiger
+  221  k get pod -n project-tiger
+  222  clear
+  223  k get pod -n project-tiger
+  224  k get pod -n project-tiger -o wide
+  225  ssh kmaster
+  226  crictl ps 
+  227  crictl ps | grep tigers-reunite
+  228  echo "d7dda0d9d51ba" > container.txt
+  229  k logs -c d7dda0d9d51ba
+  230  k describe pod tigers-reunite -n project-tiger
+  231  k logs tigers-reunite -c tigers-reunite -n project-tiger
+  232  k logs tigers-reunite -c tigers-reunite -n project-tiger > klogs.txt
+  233  history
+
