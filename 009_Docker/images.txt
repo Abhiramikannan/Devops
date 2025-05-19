@@ -1,0 +1,119 @@
+layered file system -var/lib/docker/overlay2 (default storage driver) 
+command: docker info
+read only
+layers of folders
+ plugins:
+        btrfs
+        aufs
+        daemon.json file u need to modfy(by default not there)
+stored in folders - 
+        lower directory,
+        upper directory(image inspect)
+        
+Overlayer 2- images are stored here (default storage driver),
+                        read only images and containers data also there
+
+4 layers of the Image
+    LowerDir - they store the Image
+    upperDir - they store the Image
+    WorkDir - only on run time,ref on the Image
+    MergedDir - only on run time
+    
+
+10 lines -> can i gurantee i will be having 10 folders -> create 1 layer pointing to it(tagged) if already that is present and start creating next layers top of it.
+represent actual situation in the container
+
+create container-execute line(from ubuntu:) inside the container-
+images are readnly -> images recreated when change in docker file
+
+create image for java?
+
+
+
+registry:
+    jfrog
+    azure acr
+    dockerhub
+
+cow: 
+        image created ,have file /etc/host
+        container created from same image also contain file /etc/host
+        edited the /etc/host in container
+        modifications(specific portion) stored in the writable layer of container
+        no changes in image
+        only copies part that get changed 
+
+        modificitn only in top of read only
+        image -> created   container to run-> some files required 
+        bare min file loded in memory
+        it will load from top most layer(latest version) where file is present
+        disadv:
+            run time performance impact
+        adv:
+            container start -it fast
+        soln: 
+            reduce number of layers -> load all files
+
+anythg part of image cannot change -> if change -> impact in all containers
+
+
+context
+.  -> whatever files there in context can sento daemon by docker client  
+
+
+
+/app ->absolute path
+
+already build image -> rename -> docker tag
+docker username
+
+
+pid namedspace :
+        ps
+        ps -ef
+mound namedspace 
+        each container have diff file system
+
+
+
+life cycle of image
+        Create image from docker file – build
+        Create container from image – run
+        Create image from container – commit
+        Create image from image – tag
+        Push – image pushed to docker registry
+        Pull – pull back from docker registry
+        Save – save image to backup.tar
+        Load – load back from backup.tar
+
+from: base layer
+        only command which can come before from-args
+run - execute at bult time using doker built commannd
+   2 formats for run command:
+                apt
+                ["   ", "  "] - which platform u want to run
+cmd : default
+        it defines a default instruction when starting the container which is overridden
+        latest
+        single format,square bracker
+entry point - convert container into executable
+              whatever written on entry point execute ,other all arguments
+              --entrypoint-override entrypoint
+copy - add is More vulnerable to security attcks while downloading
+        run curl
+        run wget
+        this can reduce the layers
+args - variable
+       pass env variable 
+expose - port
+        only for documentation
+workdir: all the relative path reference will be based on the work directory
+         u can have any num of work directory
+maintainer - who is the owner,use 1 more layer
+on built - if someone want to built image from my image -> first mine built executed then hims
+label - 
+healthcheck - 
+volume - create ananoymous volume and attach it to container
+        anonymous volume created in volums folder in var/lib/docker/random long big num/_data
+
+
