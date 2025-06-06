@@ -1,0 +1,17 @@
+
+inside pod or deployment
+
+===============================
+containers:
+    livenessProbe:
+        httpGet:    
+            path: /healthz
+            port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 8
+    redinessProbe:
+        httpGet:
+            path: /ready
+            port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
