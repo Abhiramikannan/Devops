@@ -1,0 +1,29 @@
+Docker volumes are 3 types:
+  tmpfs
+  bind mount
+  volumes:   
+      named volumes
+      anonymous volumes
+
+  bind mount:
+      docker run -d -v /mnt/data:/tmp/data nginx     //system's path: container path
+      cd /mnt/data =volume stored here              // stored in hostmachines path -> in our machine 
+
+  named volumes:
+    docker volume create my_volume   //created a volume named my_volume
+    docker run -d -v my_volume:/app/data nginx    // our volume_name:container volume path
+    docker exec -it contaner_id /bin/bash       //inside container
+    cd app/data                                //path inside container
+    create file
+    cd /var/lib/docker/volumes/my_volume/....see the file     //our machine
+
+ // so volumes attached with our machines are stored in /var/lib/docker/volumes/data/my_volume
+
+
+  anonymous:
+        docker run -d -v /tmp/anonymous nginx      #only container volume path specified
+        //go inside and create files
+        // our system -> volumes are in /var/lib/docker/volumes/data/...........a long container id ->no name /files
+          
+          
+      
