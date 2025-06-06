@@ -1,0 +1,28 @@
+#injecting config map into pod as env
+#only i key im injecting here
+apiVersion: v1
+kind: Pod
+metadata:
+  name: myapp
+  labels:
+    name: myapp
+spec:
+  containers:
+  - name: abhi-container
+    image: alpine
+    command: ["sleep", "3600"]
+    env:
+    - name: App_Mode
+      valueFrom:
+        configMapKeyRef:
+          name: abhi-config
+          key: App_mode
+        
+#if i need to inject every keys
+envFrom:
+- configMapRef:
+    name: abhi-config
+    
+
+#inside container
+echo $app_mode =can see the env variable
