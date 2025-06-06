@@ -1,0 +1,61 @@
+java
+
+FROM openjdk:17-jdk-slim
+WORKDIR app
+COPY target/*jar app.jar
+EXPOSE 8080
+CMD ["java","-jar","app.jar"]
+-------------------------------
+shared library:
+    def mavenBuild() {
+    sh '''
+        mvn clean install 
+        mvn test
+    '''
+    }
+
+============================================
+python
+
+FROM python:3.5-slim
+WORKDIR app
+COPY . .
+RUN pip install -r requirements.txt
+EXPOSE 5000
+CMD ["python","app.py"]
+
+--------------------------------------------
+shared library:
+def pythonBuild(){
+sh '''
+apt update -y 
+python3 -m venv abhi-venv
+. abhi-venv/bin/activate
+python3 -m pip install --upgrade pip
+pip install -r requirements.txt
+python3 -m pytest
+coverage run -m pytest
+coverage report
+'''
+}
+
+================================================
+
+
+node
+FROM node:12-alpine
+WORKDIR app
+COPY . .           #or COPY package*.json .
+RUN npm install
+RUn npm run test
+EXPOSE 3000
+CMD ["node","app.js"]
+
+-----------------------------------------------
+shared library:
+def nodeBuild()
+    {
+    sh 'npm install'
+    sh 'npm run test'
+    }
+
