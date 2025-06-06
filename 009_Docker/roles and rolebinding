@@ -1,0 +1,12 @@
+
+role binding:
+kubectl create role pod-reader --verb=get --verb=list --verb=watch --resource=pods  
+ 
+kubectl create rolebinding admin --clusterrole=admin --user=user1 --user=user2 --group=group1
+ 
+kubectl auth can-i get pods --as=user1
+
+
+
+kubectl create role --help
+kubectl create rolebinding --help
