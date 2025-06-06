@@ -1,0 +1,23 @@
+metric server:
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+kubectl edit deployment metrics-server -n kube-system
+- --kubelet-insecure-tls
+
+---------------------------------------------
+//create deployment and edit deployment resources and add cpu
+deployment:
+ resources: 
+   requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+       memory: "256Mi"
+       cpu: "200m"
+ kubectl autoscale deploy node-deployment --name=abhihpa --min=2 --max=5
+
+get inside pod
+run infinite while loop =load giving
+          while true; do :; done
+
+  watch -n 1 kubectl get pods
+          here we can see the pods which are scaling
