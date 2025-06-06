@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  creationTimestamp: null
+  labels:
+    run: pod2
+  name: pod2
+spec:
+  containers:
+  - args:
+    - sleep
+    - "1000"
+    image: nginx
+    name: pod2
+    volumeMounts:
+    - name: config-volume
+      mountPath: /etc/config
+      readOnly: true
+  volumes:
+  - name: config-volume
+    configMap:
+     name: abhi-configmap 
+
+
+#kubectl run pod2 --image=nginx --dry-run=client -o yaml > pod.yaml  #create pod and mount the volume
+#kubectl exec -it pod2 -- /bin/sh
+# cat etc/config/App_Mode
