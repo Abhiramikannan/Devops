@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: abhi-config
+data:
+  App_Mode: Production
+
+#kubectl create configmap abhi-config --from-literal=App_Mode=Production --from-literal=log_level=Debug
+#kubectl get configmap
