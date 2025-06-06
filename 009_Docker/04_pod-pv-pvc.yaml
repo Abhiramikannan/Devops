@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: myapp
+  labels:
+    name: myapp
+spec:
+  containers:
+  - name: myapp
+    image: alpine
+    command: ["sleep", "4600"]
+    volumeMounts:
+    - name: pvc-volume
+      mountPath: /mnt/data
+  volumes: 
+  - name: pvc-volume
+    persistentVolumeClaim: # starting small letter
+      claimName: mypvc
+
+
+# get inside container
+# add files inside /mt/data =f1.txt
+# can see in system /mnt/data =f1.txt
