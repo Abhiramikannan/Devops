@@ -1,0 +1,5 @@
+uname -a : To see the kernal linux feature
+docker stats: can see every resource status of a container
+lsof -i:port_number ->too see the port is already listened by some other service/not
+top
+ps -ef
