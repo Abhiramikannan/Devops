@@ -1,0 +1,10 @@
+jenkins user -> docker permssions
+  usermod -aG docker jenkins
+  systemctl restart jenkins
+  group jenkins
+
+jenkins user -> kubernetes permissions
+  mkdir -p /var/lib/jenkins/.kube
+  cp -r .kube /var/lib/jenkins/
+  chown -R jenkins:jenkins .kube    #if im outside /var/lib jenkins    give full path /var/lib/jenkins/.kube
+  systemctl restart jenkins
