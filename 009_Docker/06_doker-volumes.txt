@@ -1,0 +1,20 @@
+Tempfs
+bindmount
+volumes=anonymous,named
+
+named volume:
+docker volume create my_volume
+docker run -d -v my_volume:/app/data nginx    #my_volume=named volume
+docker exec -it contaner_id /bin/bash
+    cd app/data
+    create file
+cd /var/lib/docker/volumes/my_volume/....see the 
+
+
+bind mount:
+docker run -d -v /mnt/data:/tmp/data nginx
+cd /mnt/data =volume stored here
+
+anonymous:
+docker run -d -v :/app/data nginx  #no name given
+cd var/lib/docker/volumes/..............number
