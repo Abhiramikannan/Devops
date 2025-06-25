@@ -1,0 +1,31 @@
+metric server:
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+kubectl edit deployment metrics-server -n kube-system
+- --kubelet-insecure-tls
+deployment:
+ resources: 
+   requests:
+      memory: "128Mi"
+      cpu: "100m"
+    limits:
+       memory: "256Mi"
+       cpu: "200m"
+ kubectl autoscale deploy node-deployment --name=abhihpa --min=2 --max=5
+
+get inside pod
+run infinite while loop =load giving
+          while true; do :; done
+inside container:
+  # Get into the pod's shell
+kubectl exec -it <YOUR_NGINX_POD_NAME> -- /bin/bash
+
+# Inside the pod's shell, update apt and install stress
+apt-get update && apt-get install -y stress
+
+# Run stress (use 1 CPU core)
+stress --cpu 1 --timeout 600s # Runs for 10 minutes
+
+  then watch -n 1 kubectl get pods  (other terminal) = check pod is creating becaues of the load
+
+  
+  
