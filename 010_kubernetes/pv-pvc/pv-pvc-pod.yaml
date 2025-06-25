@@ -1,0 +1,57 @@
+#pv:
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mypv
+spec:
+  capacity:
+    storage: 128Mi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Recycle
+  hostPath:
+    path: /mnt/data  #path insde machine
+
+#hostpath
+#Caps
+
+
+#pvc
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mypvc
+spec:
+  resources:
+    requests:
+      storage: 30Mi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  
+
+#pod
+apiVersion: v1
+kind: Pod
+metadata:
+  name: myapp
+  labels:
+    name: myapp
+spec:
+  containers:
+  - name: myapp
+    image: alpine
+    command: ["sleep", "4600"]
+    volumeMounts:
+    - name: pvc-volume
+      mountPath: /mnt/data
+  volumes: 
+  - name: pvc-volume
+    persistentVolumeClaim: # starting small letter
+      claimName: mypvc
+
+
+# get inside container
+# add files inside /mnt/data =f1.txt
+# can see in system /mnt/data =f1.txt
