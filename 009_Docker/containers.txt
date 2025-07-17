@@ -184,4 +184,8 @@ Detached mode allows you to continue working in the same terminal without interr
 
 Whatever process running on the container is actually running on the host machine
 Process id of same process inside the container and host machine is different because they are running in different space.
- 
+
+
+--------------------------------------------------------------------------
+container crashes :
+        go back and read how many record inserted and update the database accordingly
