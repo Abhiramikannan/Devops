@@ -1,0 +1,166 @@
+
+
+## **🛠 Step 1: Create a New Namespace**
+First, create a namespace where we will test the RBAC setup.  
+
+kubectl create namespace test
+
+
+---
+
+## **👤 Step 2: Create a User (Without Admin Access)**
+For this example, we will create a Kubernetes user **dicktracy**.  
+
+### 🔹 Generate Certificates for User Authentication
+Kubernetes uses **TLS certificates** for user authentication. We will create a certificate for `dicktracy`.  
+
+```bash
+# Generate a private key
+openssl genrsa -out dicktracy.key 2048
+
+# Generate a Certificate Signing Request (CSR)
+openssl req -new -key dicktracy.key -out dicktracy.csr -subj "/CN=dicktracy/O=developers"
+
+# Sign the CSR with Kubernetes CA to generate a client certificate
+openssl x509 -req -in dicktracy.csr -CA /etc/kubernetes/pki/ca.crt -CAkey /etc/kubernetes/pki/ca.key -CAcreateserial -out dicktracy.crt -days 365
+```
+👉 Now, `dicktracy` has a **certificate** but no permissions yet.
+
+---
+
+## **🔗 Step 3: Create a Role to List Pods**
+Now, let's create a **Role** that allows a user to **only list pods** inside the `test` namespace.  
+
+```yaml
+# Save this file as pod-reader-role.yaml
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  namespace: test
+  name: pod-reader
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list"]
+```
+🚀 **Apply the Role:**
+```bash
+kubectl apply -f pod-reader-role.yaml
+```
+
+---
+
+## **🛠 Step 4: Bind the Role to `dicktracy`**
+Now, create a **RoleBinding** to assign the `pod-reader` role to `dicktracy`.
+
+```yaml
+# Save this file as pod-reader-rolebinding.yaml
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  namespace: test
+  name: user-pod-reader
+subjects:
+  - kind: User
+    name: dicktracy  # Assigning permission to this user
+    apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: Role
+  name: pod-reader
+  apiGroup: rbac.authorization.k8s.io
+```
+🚀 **Apply the RoleBinding:**
+```bash
+kubectl apply -f pod-reader-rolebinding.yaml
+```
+
+---
+
+## **👀 Step 5: Verify Permissions for `dicktracy`**
+Let's check if `dicktracy` can list pods in the `test` namespace.
+
+```bash
+kubectl auth can-i list pods --as=dicktracy -n test
+```
+👉 If the setup is correct, it should return:
+```
+yes
+```
+
+🚀 **Try listing pods (Should Work)**
+```bash
+kubectl get pods --as=dicktracy -n test
+```
+
+🚨 **Try deleting a pod (Should Fail)**
+```bash
+kubectl delete pod mypod --as=dicktracy -n test
+```
+👉 You should get a **permission denied** error.
+
+---
+
+## **🌎 Step 6: Assign Global Permissions (ClusterRole)**
+Let's say we want **dicktracy** to list pods in **all namespaces**.
+
+```yaml
+# Save this file as cluster-pod-reader.yaml
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: cluster-pod-reader
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list"]
+```
+🚀 **Apply the ClusterRole:**
+```bash
+kubectl apply -f cluster-pod-reader.yaml
+```
+
+Now, create a **ClusterRoleBinding** to assign this ClusterRole to `dicktracy`.
+
+```yaml
+# Save this file as cluster-pod-reader-binding.yaml
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: cluster-pod-reader-binding
+subjects:
+  - kind: User
+    name: dicktracy
+    apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole
+  name: cluster-pod-reader
+  apiGroup: rbac.authorization.k8s.io
+```
+🚀 **Apply the ClusterRoleBinding:**
+```bash
+kubectl apply -f cluster-pod-reader-binding.yaml
+```
+
+✅ **Test the new permissions**
+```bash
+kubectl get pods --as=dicktracy --all-namespaces
+```
+👉 Now `dicktracy` can **list pods in all namespaces**!
+
+---
+
+## **🎯 Summary**
+| Command | Description |
+|---------|------------|
+| `kubectl create namespace test` | Create a namespace for testing. |
+| `openssl genrsa -out dicktracy.key 2048` | Generate a private key for `dicktracy`. |
+| `kubectl apply -f pod-reader-role.yaml` | Create a Role to allow listing pods. |
+| `kubectl apply -f pod-reader-rolebinding.yaml` | Bind the Role to `dicktracy`. |
+| `kubectl auth can-i list pods --as=dicktracy -n test` | Check if `dicktracy` has permission. |
+| `kubectl apply -f cluster-pod-reader.yaml` | Create a ClusterRole to list pods in all namespaces. |
+| `kubectl apply -f cluster-pod-reader-binding.yaml` | Bind the ClusterRole to `dicktracy`. |
+
+---
+
+## **🚀 Next Steps**
+Would you like to test this in a **real Kubernetes cluster**? Or do you need help setting up a Kubernetes cluster for practice? 😊
