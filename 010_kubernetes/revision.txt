@@ -1,0 +1,218 @@
+creation of pod:
+/.kube/config-context -certificate- signed by kubernetes client->kubectl(restapi req)->info go to header
+master -control plane
+worker-data plane 
+certfile,keyfile - authentication
+roles,rolebindings,clusterrole and binding - autherization(data in etcd)
+api - event driven architecture
+scheduler - finds best node to ocreate a pod,scheduler will get triggered(etcd -how much info there in cpu(worker))
+controller - create a pod,manages the pod   
+                replica,node,pod,deployment,job controller -> packaged into single
+
+
+worker:
+proxy : knows everythg about networking
+        ip
+        pods associated with the ip
+etcd : no sql ,data comes to etcd
+        statefull - persist -scale horizontally
+
+scheudler : picks the node
+controller comes into picture when actual state not equal to current
+then goes to api server and to kubelet work with container d creates pod..come back to api server then to etcd -> running
+kubelet knows how much menory is there..updates the etcd.
+
+
+
+crud operation happens b/w api server and etcd
+scheduler - 
+
+creating a pod wht happens:
+        pod table:
+        slno     name      image    curret-state     desired state   node
+        1       ustpod       ngninx                     running         
+
+        kubectl to api server-create pod
+---------------------------------------------------------------
+replica set created:
+        rs table :
+                sno 
+                name 
+                desired replicas
+                actual replicas
+                image name
+kubectl looks current context ( get certificate and key)
+convert rest api req and sents -> api server after 4 sets makes an entry
+checks desired and actual -> replication controller comes -> create pods
+tABLE:                                                                                          
+        sno 
+        name 
+        image
+        desired
+        actual
+
+        schedueler -> picks the node
+        controller -> creates the pod
+        cri
+
+if new entry came,scheduler will come
+node goes down -> kubelett api sever communicate
+replicaset-
+        self healing
+        scale in,out
+
+
+-----------------------------------------------------------------
+
+DEPLOYMENT:
+        Sl no 
+        name 
+        current state
+        desired
+        image 
+
+        deployment controller comes into picture -> create replica set
+        replication controller watches and make entry in pod table
+        scheduler watches -> update the machine where created
+        controller - 
+        api server talks to kubet and created
+
+rolling update(n num of pods will come up once active) and roll back 
+        other staretegies support by kubernetics apart from rolling update->
+                                  recreate(deployment strategy)- remove all pods and create all set of pods
+update :
+        new entry in replicaset table
+        increase count of that and reduce count of old one in replica set and new pod of this verrsion created and the countb of replica set oledr entry reduces
+        look ppt  
+        kubectl set image deploy deployment name nginx=nginx:1.16.1
+
+------------------------------------------------------------
+how cluster ip works,Networking:
+        2 containers in same pod talk.
+                create namespace and attched to same name space
+                talk using local host
+                done by kubernetes(kubectl)
+        2 continers of 2 diff pods:
+                custom bridge created and all attached to that(ip a = we can see)
+                custom bridge=act like a switch,forward the req
+                network switch:
+                        modem @ home 
+                        when i connect 1 device to 1 ethernet port and other on other
+                        arp protocol
+                                sent the broadcast ip(last ip),handshake singnal to all devices
+                                reply back with details
+                                so switch gets ip address and mac 
+                                record this ip belongs to this mac
+                                this is how switch works
+                                if the ip address is there sent to bridge,otherwise default root
+                                default root go by gateway
+                                default root connecting to network plugin
+                                2 diff pods = ip not in range ,go to nrtwork plugin,another node netwrk plugin
+        service to pod:
+                creating cluster ip
+                ip routing table
+                when ever the entry in ip table ,cbr forward req to kubeproxy
+                proxy = having list of service ip,pod's ip
+                end points=when describe the service,kubectl sent info about pods to api
+                kubeproxy sync info to api server
+                do loadbalancing n=b/w them
+                nating hapening(address got changed)
+                msg sent back to bridge
+                bridge sent to right machine
+
+
+
+how networking works:
+        req will be only forwarded to kube proxy when the cluster ip is on the cidr range
+        nodeport will forward to cluster ip
+        nodeport
+                (know ip address and accesible)
+        loadbalancer 
+                2 levels - find service
+                          forward to one of the instance
+                each of the service create diff load balancer(login,)
+                cannot give this to customer 
+                solution: 1 public ip
+                          login - go to login
+                kubernetes service - do load balancing -forward to 1 of the pod 
+        local dns is configured to talk with google dns
+--------------------------------------------------------------
+create service 
+        so create deployment instesd of pod
+service customizer cidr change manually:
+                  change  proxy
+                  change api server
+                
+-------------------------------------------------------------------
+DNs:
+get inside pod 
+        when u hit cluster ip -finds the ip
+        see the name server =10.96.0.10-kube-dns(resolve.conf)
+        forwarding req to pod which has labelled
+        selector in pod 
+        give as label
+
+Ingress:
+        baremetal ingress controller installed in ur envt
+        13th line ingress simple instruction.txt 
+        httpd - shows -it works
+        forwarding req to nodeport associated with ingress controller
+        ingress controller referring to ingress rules
+        these are 2 levels of load balancing
+
+scheduling:
+        
+
+
+
+
+clusterip:
+
+ git clone https://github.com/vilasvarghese/docker-k8s
+  157  cd docker-k8s/yaml/services/
+  158  ls
+  159  cat cluster-ip.yaml 
+  160  kubectl get pod,svc
+  161  kubectl delete pods --all
+  162  kubectl get pod,svc
+  163  kubectl apply -f cluster-ip.yaml 
+  164  kubectl get svc
+  165  kubectl get pods
+  166  curl 10.107.138.218
+  167  kubectl run nginx --image=nginx
+  168  curl 10.107.138.218
+  169  kubectl get pods -o wide
+  170  curl 10.107.138.218
+  171  kubectl describe svc my-cluster-ip 
+  172  kubectl run -l mginx --image=nginx
+  173  kubectl get pods --show-labels
+  174  curl 10.107.138.21
+  175  curl 10.107.138.218:80
+  176  curl 10.107.138.218
+  177  kubectl get svc
+  178  curl 10.107.138.218
+  179  curl 10.107.138.218:80
+  180  kubectl get pods
+  181  kubectl get po -o wide
+  182  curl 10.32.0.6
+  183  kubectl get svc
+  184  curl 10.107.138.218
+  185  kubectl describe svc my-cluster-ip
+  186  kubectl get po -l app=my-cluster-ip
+  187  kubectl get po --show-labels
+  188  kubectl edit svc my-cluster-ip
+  189  kubectl get po -l app=nginx
+  190  kubectl edit svc my-cluster-ip
+  191  kubectl describe svc my-cluster-ip
+  192  kubeclt get svc
+  193  kubectl get svc
+  194  curl 10.107.138.218
+  --------------------------------------------
+  lb -create ext load balancer(aws) - public ip dns
+  use nort port - 
+
+ingress- path-based-routing(alowing)
+           
+network policy : restriction 
+------------------------------------------------------
+api server-etcd -husband wife relation
