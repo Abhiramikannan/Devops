@@ -25,5 +25,27 @@ Docker volumes are 3 types:
         //go inside and create files
         // our system -> volumes are in /var/lib/docker/volumes/data/...........a long container id ->no name /files
           
-          
+
+
+
+-------------------------------------------------------------------------------
+tempfs:
+    stores data in memory
+    container gone,data gone
+    sometimes the data in the container u dont want
+    reduce size of writable layer
+    when  u start the container  refer to image and writable layer
+    writable layer increases-time taken to start container increases
+---------------------------------------------------------------------------
+bindmount:
+    attach any locn of host machine to container
+    3 parameters after -V
+        1.where on the host machine
+        2.inside a container
+                     -mandatory
+        3.what is the access type
+        all seperated by colon
+
+1st parameter: like $pwd -folder path as bind mount
+2nd parameter : location
       
