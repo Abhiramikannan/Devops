@@ -1,0 +1,43 @@
+What is Bridge in Docker? (Simple Explanation)
+A bridge in Docker is the default network that allows containers to communicate with each other on the same host while keeping them isolated from external networks.
+
+How Bridge Network Works?
+When you run a container, Docker automatically assigns it to the default bridge network (bridge).
+Containers in the same bridge network can communicate using their names.
+By default, containers cannot access each other unless you explicitly connect them.
+How to Use Bridge Network?
+1. Check Available Networks
+
+docker network ls
+Shows the default bridge network and any custom networks.
+2. Create a Custom Bridge Network
+
+docker network create my_bridge
+Creates a new isolated bridge network.
+3. Run a Container in the Custom Bridge Network
+
+docker run -d --name my_container --network my_bridge nginx
+The container joins my_bridge instead of the default bridge.
+4. Connect Two Containers
+
+docker run -d --name app --network my_bridge ubuntu
+docker run -d --name db --network my_bridge mysql
+app and db can now talk to each other using their container names.
+5. Inspect a Network
+
+docker network inspect my_bridge
+Shows details like connected containers and IP addresses.
+6. Remove a Network
+
+docker network rm my_bridge
+Deletes the network (containers must be stopped first).
+Key Takeaways
+The bridge network is the default Docker network.
+Containers in the same bridge can communicate using names.
+Use custom bridge networks for better isolation and control.
+By default, bridge does not allow external access (use -p for port mapping).
+
+
+--------------------------------------------------------------
+in custom bridge:
+    named communication possible
