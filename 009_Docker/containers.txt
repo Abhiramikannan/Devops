@@ -1,0 +1,187 @@
+process(any prgm execute on computer) of host machine
+when u create container:
+        ps -ef | grep c =instance of containerd runc v2 
+ephimeral
+lightweight processes
+running containers continue to refer images-proccess data -so they need folders(merge dir and work dire)
+its own independent name spaces,c groups(control the utilization of memory and cpu)-kernal feature
+
+when u do same thing using java why dont u get that feeling ur working on diff machine-ns,c group?
+diff namespace ->
+        host
+        file system space -
+        process
+        user 
+                -users gettig attached to the proccess in tat ns
+        network space
+        ipc and rpc(inter process communication and remote procedural call)
+all ns are -
+        pseudo isolation
+        when u do ps -ef in container some process are running -actually they are running in hostmachine only
+        linux kernal capability
+when install docker-2 things installed
+        docker client -inorder to work with docker
+        docker daemon-background proccess
+        client talk to daeman by rest api(intercept the req and convert to rest req)
+
+containers goes down -
+        no os
+        no process
+        no process listening into its
+        docker run ubuntu ps -ef (go down)
+
+new changes
+        writable layer ne containers file lu aan store cheyyne
+docker container is just an instance of docker container d runc -v2 instance /crio
+        managing images
+replacing dockershim with containername
+
+why we are creating containers?
+to support docker kubernetics created docker shim
+inorder to support kubernetics write their own docker shim
+
+image pulling done by kubernetics
+ 
+
+
+ how many containers created -> that much instance of procedd created
+
+ internally
+ start the cotainer -> refer to both the images and writable layer
+ run the container -> refer to the image and create new writable layer
+
+
+ cpu- painting like dot ,1 by 1
+ gpu - flash painting, fully
+
+
+
+ update-
+    memory management-swap,..
+    cpu
+    pid limit -> limit number of proceeses
+    manage restart policy
+    blkio -> how much block reading
+
+docker container --help
+attach -> attach to root process
+exec -> attach next to root process -> next process
+
+copy files from local host to container -> copy to writable layer
+                container to local host
+
+commit -> create a image from the container
+   apt update -y & apt install nano
+   docekr commit -m "nano" new ubuntu_nano -> new image created
+   verify: -> 
+   upper dire -> writable
+   lower -> image layer
+
+diff->
+    created a container
+    created a file inside it
+    docker diff containername
+     A / filename -> if created or added new file
+     D / filename -> deleted  a file
+
+docker diff in 2 containers runnning
+        create another container -> docker run -it --name c2 ubuntu bash
+        ls
+        docker diff c1:./ c2:./ -> root vs root -> not working
+        docker diff : comparing the writable layers
+
+process 1 -kernal coming up (linux machine)
+
+
+
+
+all the process in linux
+         -connected to root namespace
+
+
+
+---------------------------------------------------------------------------------
+create container:
+        when u create a container it will refer to an image 
+        container having a writable layer too
+
+
+enable docker:
+         Docker automatically starts when you turn on your PC.
+disable docker:
+         You must manually start Docker every time.
+docker pause:
+        buffer the req
+        docker pause my_container    # Freezes the container (CPU stops, but memory is intact)
+docker unpause:
+        docker unpause my_container  # Resumes execution from where it was paused
+stopping all containers:
+        docker stop $(docker ps -a -q)
+        -a--> to see stopped containers
+        -q-->display container id
+remove all containers:
+        docker rm $(docker ps -a -q)
+
+--------------------------------------------------------------------------
+container commands:
+        docker run -it ubuntu bash 🡪  run a container from image
+                                       create and get inside
+        
+
+        docker run -d -p 8080:80 nginx [host:container]
+                        -> you can access Nginx in your browser at http://localhost:8080.
+
+
+        docker run --name my_nginx -d nginx [Custom name]
+                         --name my_nginx → Assigns a custom name to the container (my_nginx).
+                         -d nginx → Runs Nginx in detached mode.
+
+        docker ps --> current running container
+        docker ps -a --> show all container
+
+        docker start <container_id> --> start container
+        docker stop <container_id> --> stop container
+        docker restart <container_id> --> restart container
+        docker kill <container_id> -->  kill container
+        kill -9 <pid>  --> shows exited
+
+        docker rm <container_id> --> remove container
+        docker container prune --> remove all stopped container
+        docker rm -f <container_id> --. remove force fully
+
+        docker exec -it <container_id> bash --> connect to running container
+        docker attach <container_id> --> attach to running process
+
+        docker container inspect <container_id> --> detailed information about a running or      stopped container.
+
+        docker container prune --> Remove All Stopped Containers
+        docker system prune -a -->  Remove Unused Images, Networks, and Volumes
+        Docker pause container_id 🡪 pause the container
+        Docker unpause container_id 🡪 to unpause
+        Docker stop $(docker ps -a -q) 🡪 stop all the containers
+        Docker rm $(docker ps -a -q) 🡪 remove all containers
+        
+
+
+
+
+ Docker File Transfers, Container Info & Cleanup Commands:
+       docker cp myfile.txt <container_id>:/app/ --> Copy from Host to Container
+                                                     Sends myfile.txt from the host to the /app/ directory inside the container.
+       docker cp <container_id>:/app/myfile.txt . --> Copy from Container to Host
+                                                     Retrieves myfile.txt from the container and saves it to the current directory on the host.
+       docker stats --> Monitor Container Resource Usage
+
+       docker commit <container_id> my_custom_image -->  Convert a Running Container into an Image
+       docker commit my_nginx my_nginx_backup
+       docker images
+
+-----------------------------------------------------------------------
+Purpose of running container in detached mode :
+It allows the container to run in the background.
+Detached mode allows you to continue working in the same terminal without interruption.
+
+
+Whatever process running on the container is actually running on the host machine
+Process id of same process inside the container and host machine is different because they are running in different space.
+ 
