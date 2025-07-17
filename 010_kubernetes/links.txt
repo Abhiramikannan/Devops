@@ -1,0 +1,2 @@
+https://github.com/vilasvarghese/docker-k8s/blob/master/yaml/ingress/simple/instructions.txt
+
