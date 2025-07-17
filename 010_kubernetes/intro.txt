@@ -1,0 +1,357 @@
+KUBERNETES
+Kubernetes is a tool that helps us to run and manage applications in containers. It is an open-source container orchestration platform that automates the deployment, management, and scaling of container-based applications in different kinds of environments like physical, virtual, and cloud-native computing foundations.
+
+Kubernetes Cluster Architecture (With Multiple Masters and Workers)
+ Worker → Master: Uses Load Balancer to distribute API requests.
+ Master → Worker: Communicates directly without a Load Balancer.
+	•  The Master already knows each Worker’s IP. 
+•  It needs full control over Worker Nodes. 
+•  kubelet and kube-apiserver handle direct requests efficiently
+4 components of master node:
+	•  kube-apiserver 
+•  kube-scheduler 
+•  kube-controller-manager 
+•  etcd cluster
+API server (REST language talks only)
+•  kubectl is a client that converts commands into REST API requests. 
+•  Requests are sent to the API Server, which handles everything, sents keys too . 
+•  By default, the API Server performs 4 actions: 
+1.	Authenticate – Checks who is making the request.
+2.	Authorize – Verifies if the user has permission.
+3.	Validate – Ensures the request data is correct.
+4.	Talk to etcd – Stores or retrieves cluster state data.
+ETCD :  No sql Database designed to scale horizontally.
+•  API Server, Scheduler, and Controller Manager do not store data. 
+•  Only ETCD stores data because it is the key-value store that maintains the cluster state.
+
+What can API Server do with Database?
+Ans: Querry
+	  CRUD operation , list /select
+POD : bigger than container.
+When you create, modify, or delete a Pod, it's like performing operations on a database table stored in etcd.
+•	Create a Pod → Insert a new entry in the Pod table (stored in etcd).
+•	Modify a Pod → Update the existing entry in the Pod table.
+•	Delete a Pod → Delete the entry from the Pod table.
+
+In  kubernetic, api server not the only one do all operations:
+The API Server is like a receptionist in a hotel—it doesn’t do everything itself but acts as the central point for all requests.
+API SERVER : CRUD operation with ETCD.
+
+SCHEDULAR
+The moment when we do entry in POD table, we don’t know which machine it is ,schedular picks automatically and run one of the algorithm and finds out the best machine.
+
+•	ETCD : will have all info …cpu info,memory info
+•	Every master have different ETCD
+•	API server can only directly talk to ETCD
+•	Whoevr needs to talk to ETCD comes to API server and api server talks to ETCD
+
+    CONTROLLER
+
+
+Kubelet:
+o	Continuously sent info about worker node to master
+o	If any container downs replace container
+o	Intimates to api server
+	
+
+
+
+HOW DOES ETCD GETS ALL INFO OF MEMORY AND CPU?
+Through  kubelet. 
+
+POD :
+o	Group of 1 or more container. 
+o	You can run multiple containers in a pod.
+o	Shared namespace
+o	All containers inside pod are collocated,co-scheduled.
+o	Pod will be having 1 ip and containers inside will also have same ip
+
+•	API Server, etcd, Scheduler, and Controller Manager are NOT daemon processes because:
+o	They are running as pods.
+•	Pods : independent and alive but they go together
+o	Eg:  pod of peace
+•	Recommendation: Run only 1 container in pod
+•	When to Use Multiple Containers in a Pod?
+🔹 When containers must work together (e.g., a web server + sidecar logging container).
+🔹 When they share storage and need to communicate using localhost.
+•	Pod crashes: only front end crashes but need to do entire thing.
+•	All of containers will run on same pod, all the containers in the pod are collocated and co-scheduled(coming together), share spaces. 
+•	Multiple containers in pod share name spaces.
+•	The pod has a single IP address (not separate IPs for each container).
+o	All containers inside pod having asame ip of pod,if any crashes only kuberenets will replace container(maybe diff ip)
+•	How to access 1 container? 
+How to Access a Specific Container in a Pod?
+1.	From Within the Pod (Using localhost)
+Since containers share the network namespace, they can talk to each other using localhost:<port>
+•	attach a volume in pod,that voulme is available to be mounted on all the containers.
+•	How to Attach a Volume in a Pod?
+In Kubernetes, when you attach a volume to a Pod, it can be shared across all containers in the Pod because all containers in a Pod share the same storage namespace.
+•	Why Can All Containers Access the Volume?
+1️. Pods Share Storage Namespace → Any volume attached to a Pod is available for all containers inside it.
+2️. Containers Can Mount the Same Volume Path → Multiple containers in the same pod can mount the volume at different or the same paths.
+3️. Useful for Data Sharing → Example: One container writes logs, another container reads and processes them.
+
+
+•	2 containers of diff pods can talk to each other using ip address.
+•	What happens when u create a pod?
+o	Kubectl makes rest api req to api server(passes certificate,actual req(get,put,post,dlte),access key & secret key.
+o	Api server:
+	Authenticate(using certificate) -> ap server talk to etcd
+	Autherize -> 
+	Validate -> creating pod
+•	Store data in etcd(not in tables)
+•	Kubelet run abhipod –image-=nginx
+
+Slno
+Podname = abhipod
+Image = nginx
+Node (scheduler finds) = workernode
+Desired status->running(controller)
+Actual status(controller)
+Kubectl->Api server -> kubelet -> CRI
+Kubelet work with cri
+•	When a pod crashes, replace with new pod (ip address diff- no guarantee having same ip),new named spaces.
+•	Pods are ephemeral
+•	What Kubelet Actually Does?
+•	Kubelet does NOT create containers directly. Instead, it communicates with the Container Runtime Interface (CRI) to manage and run containers.
+
+
+POD CREATION:
+
+kubectl → API Server → etcd → Scheduler → API Server → Kubelet → CRI → Containers.
+
+AWS:
+
+Kubectl describe pod podname
+Kubectl  describe node node_name  | grep “Taint”
+
+To remove taint
+Kubectl taint node node_name  <taint>--
+	Untainted
+kubectl taint node kmaster node-role.kubernetes.io/control-plane:NoSchedule-
+kubectl get pod
+
+
+installing kubernetics:
+		kubeadm – tool used to set up a Kubernetes cluster easily
+		kubecops
+		kindinstall – within docker you can create
+		hardway of installation
+		
+kubectl – communicate with API servers
+kubeadm reset
+kubeadm init  -fail sometimes-installing kubernetics
+kubeadm init –ignore -preflight-errors
+kubelet – interact with cri and creates pod
+
+Creating pod:
+	kubectl run mypod –image=nginx
+kubectl get pod -o wide (where it get created) – randomly went to one of those machines.`
+curl <pod ip> = pod running on other machine and accessing in diff machine using ip(nating happens).(worker – ( pod created )to master).
+Kubectl api-resources(all resources)
+Short form for pod -po
+Ps -ef | grep runc (no containerd)
+Kubectl delete pod –all ( don’t change systems pod)
+Kubectl get po -n kube-system -o wide ( can see 2 podes-proxy,calico)
+
+Create a pod -> see which which machine running -> go to the node -> do ps-ef | grep runc -> see the containers -> kill it -> again ps -ef | grep runc -> container will be there -> kuberentes replace the container
+
+	
+Specification:
+	Networking interface of kubernetics.
+	JVM
+
+PAUSE CONTAINER:
+	If we are creating docker container use pause containers, 
+	Automatically inject a container.
+	When docker is making any change they are talking to container pod.
+	If pause container crashes , entire pod will be replaced
+	If our container crashes,it only replaced.
+	
+Purpose: docker made a docker container to communicate with Kubernetes instead of  directly communicating with docker.
+
+
+When u crash pod what happens?
+	Pulling image
+	Created container
+	Started pod
+o	Locally fixed by kubelet
+If I dlte the pod my mistake.Is there any way to solve this?
+Kubelets and cri = not run as a pod
+No swapspace utilization in Kubernetes
+	Sometimes  crash happens  when the process in harddisk comes back and active.
+	Sudo swapoff -a -> swap off in current session
+Restart -automatically disabled by other command(for future session)
+CREATING POD USING YAML FILE
+o	Cloning the repo
+o	Cd docker-k8s/yaml/calico
+o	kubelet
+o	Ls
+o	Cd ..
+o	Cd depoloyment
+o	Cat ng-pod.yaml 
+
+	Metadata -> we can mention anythg
+	Try to work with the obj of its name
+	One pod with unique name, otherwise fails
+	Containers:
+•	Name:nginx(reference)-doesn’t mean kubernetses will create a container
+Some imp commands:
+Kubectl apply -f  file_name(create pod)
+Kubectl delete -f (dlte all obj present in that fle)
+Kubectl dlte podname (dlte pod)
+Kubectl get object object_name
+Kubectl describe object object_name
+Kubectl api-resources
+Delete pod –all
+Kubectl edit rs <frontend> = directly make changes in running objects without tracability
+
+Kubectl get secrets -n kube-system
+Kubectl get ns(namespaces) =4
+What all are running inside kubesystem namespace?
+	The kube-system namespace is created by default in every Kubernetes cluster. It stores essential system components needed for cluster operations.
+🔹 What is patch in Kubernetes?
+In Kubernetes, a patch is used to update an existing resource partially (without deleting and recreating it).
+🔹 Why Use Patch?
+✅ Modify only specific fields instead of replacing the entire YAML
+✅ Faster than kubectl apply
+✅ Useful for quick updates like changing labels, images, or annotations
+
+🔹 Kubernetes Replicas, ReplicaSets, and Deployments - Simple Explanation
+     	📌 What is a ReplicaSet?
+A ReplicaSet ensures that a specific number of identical Pods are running at all times. If a pod fails, the ReplicaSet creates a new one automatically.
+     📌 Commands to Manage ReplicaSets
+1️⃣ Check existing ReplicaSets
+kubectl get rs
+2️⃣ Scale a ReplicaSet to 3 pods
+kubectl scale rs frontend --replicas=3
+3️⃣ Check pod details (IPs will be different)
+kubectl get pods -o wide
+4️⃣ Delete a pod (A new pod will be created automatically)
+kubectl delete pod <pod-name>
+💡 Pods are not guaranteed to have the same IP after deletion!
+________________________________________
+🔹 Deployment → ReplicaSet → Pods
+A Deployment manages ReplicaSets, which in turn manage Pods.
+✅ Advantages of Deployments
+✔ Scaling (Scale Out & Scale In)
+✔ Self-healing (Pods restart if they fail)
+✔ Rolling Updates & Rollbacks (Upgrade safely)
+✔ Automatic failover (Pods restart automatically)
+✔ Zero Downtime Upgrades (Ensures app is always available)
+________________________________________
+🔹 Rolling Updates (Zero Downtime Upgrade)
+Instead of stopping everything at once, Rolling Updates update pods one by one without downtime.
+1️⃣ Upgrade Deployment (Edit the YAML or use command)
+kubectl set image deploy nginx-deployment nginx=nginx:1.21.0
+2️⃣ Check rollout status
+kubectl rollout status deploy nginx-deployment
+________________________________________
+🔹 Rollback (Undo an Update)
+If the new update fails, rollback to the previous version:
+kubectl rollout undo deploy nginx-deployment
+________________________________________
+🔹 Summary
+•	Deployment manages ReplicaSets, which manage Pods.
+•	ReplicaSet ensures a fixed number of pods are running.
+•	Rolling Updates ensure zero downtime.
+•	Rollback restores the previous stable version if needed.
+💡 Deployments provide easy scaling, updates, and self-healing for applications! 🚀
+🔹 What is a Label in Kubernetes?
+A label is a key-value pair used to categorize and organize Kubernetes resources like Pods, Deployments, and Services.
+	apiVersion: v1
+kind: Pod
+metadata:
+  name: my-pod
+  labels:
+    env: production   # 👈 Label key = env, value = production
+    app: my-app       # 👈 Label key = app, value = my-app
+spec:
+  containers:
+    - name: nginx-container
+      image: nginx
+🔹 Why Use Labels?
+✅ Identify and filter resources easily
+✅ Group similar resources (e.g., all env=production Pods)
+✅ Selectors use labels to find matching resources
+✅ Useful for scaling, rolling updates, and networking
+🔹 Get Resources Using Labels
+1️⃣ List Pods with a specific label
+kubectl get pods -l app=my-app
+2️⃣ Delete all Pods with a specific label
+kubectl delete pods -l env=production
+3️⃣ Apply a label to an existing resource
+kubectl label pod my-pod tier=frontend
+
+Why Are There Extra Characters in Deployment Name?
+When you create a Deployment, Kubernetes automatically generates a ReplicaSet with a random suffix to ensure uniqueness. This happens because:
+1️⃣ Deployments create ReplicaSets, not just Pods
+2️⃣ ReplicaSets use a hash suffix (e.g., nginx-deployment-8d94c585f)
+3️⃣ Pods inherit the ReplicaSet name with their own unique suffix
+Q. When Does a Deployment Create Multiple ReplicaSets?
+o	Updates and roll back 
+o	Deployment controller make its entry
+o	Replication controller makes its entry
+
+Q. Create a completely new spring boot application and push the image and update and deployment..
+Q. why apps/v1
+Q. Always restapi will have versions y?
+o	comeup with other endpoints later v2/kll
+o	after coming new versions only remove older one
+Q. Service discovery and load balancing:
+o	Service discovery allows services to find and communicate with each other without knowing IP addresses.
+o	ClusterIP is the default service type in Kubernetes that allows communication between Pods inside the cluster. It provides service discovery and load balancing automatically.
+
+How clusterip works?
+1.	Imagine each container on different pods (p1 and p2)
+2.	Each container inside pod is listening to same service(c1 and c2)
+3.	If some other container(c3) of diff pod(p3) within the cluster need to access the service listened by the container mentioned in the p1 or p2 (same service)
+4.	P3 goes to clusterIP (static ip) and clusterip decides the pod.
+5.	ClusterIP acts as a load balancer and decides which Pod (p1 or p2) should receive the request.
+6.	By default, it follows a round-robin strategy.
+7.	The request reaches one of the available Pods dynamically.
+
+o	Nordport: make services accessible to the trusted service within the cluster(my own babies).
+o	Nodeport always create cluster ip internally.
+o	Nodeport reserves port on hostmachine 
+o	Loadbalancer: Used in cloud providers like AWS, GCP, Azure.
+ Exposes a public IP for external access.
+o	Target pod: The Pod that receives the request when you access an application is called the Target Pod.
+
+        
+Q. How to Find Pods Associated with a Service in Kubernetes?
+        A Kubernetes Service selects Pods using label selectors.
+
+15/3/25
+raft algorithm?
+o	finds a node which is doings things faster as master
+o	if master goes down again same raft algorithm comes into picture
+daemon sets?
+o	created on all worker nodes
+o	1 pod in all nodes(use-cases:monitoring,kubeproxy,logging agents)
+statefull set?
+o	also kubernetes service created along with replica set
+o	multiple rEplicas,kubernetes service forward req to primary then secondary if primary crashes
+o	3 pods -> req will go to pod to pod if that pod crashhes..done by load balancer
+o	which pod comes up first is primary
+o	cluster ip acts as load balancers
+
+replication controller and replicaset?
+o	replica set: in check 
+o	replication controller: equals
+
+
+
+	
+
+
+	
+	
+
+
+
+
+
+
+
+
