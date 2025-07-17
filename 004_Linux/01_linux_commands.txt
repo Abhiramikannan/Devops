@@ -1,0 +1,9 @@
+linux kernal feature:
+  uname -a
+
+cpu and memory:
+  docker stats
+
+health:
+  top
+  
