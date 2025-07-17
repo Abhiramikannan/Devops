@@ -1,0 +1,427 @@
+
+Docker root directory 🡪 /var/lib/docker
+Inside this 
+             Buildkit – contains container related things
+                        build  image
+             Containers- writable layers of container comes here,data associated with running containers
+             Volume - persist the data
+             Image -here not images store
+             Overlayer 2- images are stored here (default storage driver),
+                        read only images and containers data also there
+             Plugins - data about docker plugins
+
+
+
+Purpose of running container in detached mode :
+It allows the container to run in the background.
+Detached mode allows you to continue working in the same terminal without interruption.
+
+
+Whatever process running on the container is actually running on the host machine
+Process id of same process inside the container and host machine is different because they are running in different space.
+ 
+
+control group: 
+         helps to monitor and control process,resources inside container
+
+
+cow:
+    image created ,have file /etc/host
+    container created from same image also contain file /etc/host
+    edited the /etc/host in container
+    modifications(specific portion) stored in the writable layer of container
+    no changes in image
+    only copies part that get changed
+
+
+performance:
+        lesser the number of layers better the performance of container
+         1. combining run commands
+         2. use multistage build --> multiple FROM
+         3. minimize num of copy and add instructions
+         4. use .dockerignore file to exclude unnecessary files.
+         5. Use slim base images like alpine instead of larger images.
+         6.  Clean up temporary files and caches in the same RUN instruction to avoid extra layers.
+
+
+
+Cannot Remove Image:
+        if a image is having  stopped or running container cant remove the image
+        if another image refering to an image cannot remove that image
+        solution: remove container
+
+
+
+create container:
+        when u create a container it will refer to an image 
+        container having a writable layer too
+
+
+enable docker:
+         Docker automatically starts when you turn on your PC.
+disable docker:
+         You must manually start Docker every time.
+docker pause:
+        buffer the req
+        docker pause my_container    # Freezes the container (CPU stops, but memory is intact)
+docker unpause:
+        docker unpause my_container  # Resumes execution from where it was paused
+stopping all containers:
+        docker stop $(docker ps -a -q)
+        -a--> to see stopped containers
+        -q-->display container id
+remove all containers:
+        docker rm $(docker ps -a -q)
+
+
+
+What makes u feel they are different virtual machines?
+File system
+Processes running inside
+Network stack (ip, socket, port)
+User
+Hostname
+Inter process communication (in the same machine two process can communicate each other through RPC [remote procedure call]. But between process in different machine is not possible)
+
+
+
+Create image from docker file – build
+Create container from image – run
+Create image from container – commit
+Create image from image – tag
+Push – image pushed to docker registry
+Pull – pull back from docker registry
+Save – save image to backup.tar
+Load – load back from backup.tar
+
+
+
+Docker 4 major things-
+    images --> docker image
+    network --> docker network
+    data volumes --> docker volume
+    conatiners --> docker conainer
+
+
+
+commands:
+    ps -ef --> to see all process running on the machine
+
+Docker images:
+    docker images/docker image ls --> list all images
+    docker build -t <image_name>:<tag_name> . --> build image from docker file
+                                     t -> tag
+                                     tag_name = not mandatory
+                                                assumes it as latest if didnt give
+                                     . -> current folder,Sends all files/folders inside the current directory (.) to Docker Daemon.
+
+    docker login before push
+    docker push myusername/myimage:v2  🡪  push the image to registry.
+                                           myusername -> dockerhub user name
+                                           myimage -> image name
+                                           v2 -> tag name
+    docker pull ubuntu:latest   🡪 pull image from registry
+    docker rmi <image_name_or_id>   🡪 remove image
+    docker inspect <image_name_or_id>  🡪 To view detailed information about a Docker image, including its layers, metadata, and configuration.
+
+
+
+4 layers of the Image
+    LowerDir - they store the Image
+    upperDir - they store the Image
+    WorkDir - only on run time,ref on the Image
+    MergedDir - only on run time
+    
+
+container commands:
+
+        docker run -it ubuntu bash 🡪  run a container from image
+                                       create and get inside
+        
+
+        docker run -d -p 8080:80 nginx [host:container]
+                        -> you can access Nginx in your browser at http://localhost:8080.
+
+
+        docker run --name my_nginx -d nginx [Custom name]
+                         --name my_nginx → Assigns a custom name to the container (my_nginx).
+                         -d nginx → Runs Nginx in detached mode.
+
+        docker ps --> current running container
+        docker ps -a --> show all container
+
+        docker start <container_id> --> start container
+        docker stop <container_id> --> stop container
+        docker restart <container_id> --> restart container
+        docker kill <container_id> -->  kill container
+        kill -9 <pid>  --> shows exited
+
+        docker rm <container_id> --> remove container
+        docker container prune --> remove all stopped container
+        docker rm -f <container_id> --. remove force fully
+
+        docker exec -it <container_id> bash --> connect to running container
+        docker attach <container_id> --> attach to running process
+
+        docker container inspect <container_id> --> detailed information about a running or      stopped container.
+
+        docker container prune --> Remove All Stopped Containers
+        docker system prune -a -->  Remove Unused Images, Networks, and Volumes
+        Docker pause container_id 🡪 pause the container
+        Docker unpause container_id 🡪 to unpause
+        Docker stop $(docker ps -a -q) 🡪 stop all the containers
+        Docker rm $(docker ps -a -q) 🡪 remove all containers
+        
+
+
+
+
+ Docker File Transfers, Container Info & Cleanup Commands:
+       docker cp myfile.txt <container_id>:/app/ --> Copy from Host to Container
+                                                     Sends myfile.txt from the host to the /app/ directory inside the container.
+       docker cp <container_id>:/app/myfile.txt . --> Copy from Container to Host
+                                                     Retrieves myfile.txt from the container and saves it to the current directory on the host.
+       docker stats --> Monitor Container Resource Usage
+
+       docker commit <container_id> my_custom_image -->  Convert a Running Container into an Image
+       docker commit my_nginx my_nginx_backup
+       docker images
+
+
+
+volumes:
+        docker volume create my_volume --> create volume named my_volume
+        docker volume ls --> list volume
+        docker volume inspect my_volume --> inspect volume
+        docker volume rm my_volume --> remove volume
+        docker volume prune --> remove all unused volume
+
+        docker run -d -v /home/user/data:/app/data ubuntu --> bind mount
+
+                Binds the /home/user/data folder from the host to /app/data in the container.
+                Changes inside the container reflect on the host, and vice versa.   
+
+        docker run -v my_named_volume:/data ubuntu --> named volume
+
+                    Attaches the named volume my_named_volume to /data in the container.
+                    Docker manages the storage (useful for databases).
+
+
+        docker run -v /data ubuntu --> anonymous volume
+
+                    Creates an unnamed volume automatically, useful for temporary data.
+
+
+        docker run -v my_volume:/app/data:ro ubuntu --> change to read only
+
+                        Mounts my_volume as read-only (ro = Read-Only).
+                        The container cannot modify files inside /app/data.
+        
+        
+
+Network:
+    docker --version
+   26  docker network ls
+   27  docker run -dit --name container1 alpine sh 
+   28  docker run -dit --name container2 alpine sh
+   29  docker network inspect bridge
+   30  docker inspect container1 | grep "IPAddress"
+   31  docker inspect container2 | grep "IPAddress"
+   32  docker ps
+   34  docker exec -it 45 sh
+   35  docker exec -it 1c sh
+   39  sudo docker network create my_bridge
+   40  docker network ls
+   41  docker run -dit --name container3 --network my_bridge alpine sh
+   42  docker inspect eb | grep "IPAddress"
+   43  docker exec -it conatiner3 ping 172.17.0.2
+   44  docker exec -it container3 ping 172.17.0.2 -> fail no connection
+   45  docker network connect bridge container3
+   46  docker exec -it container3 ping 172.17.0.2
+   47  history
+   48  docker stop container1
+   49  docker ps
+   50  docker stopp eb
+   51  docker stop eb
+   52  docker stop 1c
+   53  docker ps
+   54  docker stop container2
+   55  docker rm container2
+   56  docker rm container1
+   57  docker rm container3
+   58  docker network rm my_bridge
+   59  docker network ls
+   60  docker ps
+
+
+
+storage driver  / registries  / flaten images->  save->convert image to tar/ export ->container you can create image
+import->u get an image
+images stored other than overlay2
+storage driver:
+    default->var/lib/docker/overlay2
+    docker info | grep "Storage Driver"
+    other: aufs
+          btrfs
+          ZFS
+          VFS
+
+deomen.json file need to edit
+        /etc/docker/daemon.json and add:
+            {
+       "storage-driver": "overlay2"
+            }
+
+CNCF (Cloud Native Computing Foundation) supports open-source cloud-native projects like Kubernetes. 
+    no owner
+
+
+prometheous:
+    monitoring tool
+    c group : linux kernal feature
+
+long format
+        -d -> --detached
+        -p -> --publish
+
+
+
+
+
+BRIDGE-NETWORKING:
+
+docker --version
+docker network ls
+docker network inspect bridge
+docker run -dit --name container1 alpine sh
+docker run -dit --name container2 alpine sh
+docker inspect container1 | grep "IPAddress"
+dockeer exec -it container2 ping container1 ip
+docker network create my_bridge
+dockr run -dit --name conatiner3 --network my_bridge alpine sh
+docker exec -it container3 ping container1ip -> fails
+docker network connect bridge container3
+docker exec -it container3 ping ipadd
+
+UPGRADE DOCKER:
+    backup
+    dlte
+    reinstall
+
+NETWORK POLICY
+XCD backup
+
+CONFIGURING LOGING DRIVERS:
+    splunk - externalized loging tool 
+    elk
+    dynatrace
+    datadok
+
+manager nodes -> works in active passive
+all service ,stack,stack internally create task ..all taking care by manager node
+
+configuring dockers swarm node:
+    1 . node roles and initialization
+    2. node configuration
+    3.node management
+    4.security considerations
+        https communication -> tls
+    5.monitoring and loggin
+
+DOCKERSWARM BACKUP:
+1.back up of entire volume
+2.files backup
+3. database backup
+4.no images backup
+5.swarm foldr backup
+6 stop
+7. clean and whatever you want to do
+
+IMAGE SIZE OPTIMIZATION:
+$- make layers minimal
+multi satged image building
+moivng freqently changininglines
+manually cleanup -> remove caches
+
+tagging and versioning 
+testing and validation
+
+FLATTEN DOCKER IMAGE:
+    run,$
+
+LOCK UR SWARM CLUSTER:
+    cannot create anythg more
+    create token while lock
+
+MANAGER NODE HA:
+    RAFT CONSENSUS
+
+OVERLAY NETWORKS:
+    2377,7946,4789 -> PORT NUMBERS
+    GET IP ADDRESS OF MANAGER NODE IN DOCKER SWARM 
+    IN DOCKER SWARM ..TOKEN GENERATE..IN THAT TOKEN...U CAN SEE THESE NUMBRS..
+
+NODE LABELS:
+
+BUILDING DOCKER APPLICATION USING STACK
+
+METHODS TO CONFIGURING EXTERNAL DNS:
+
+DOCKER SECURITY:
+    1. IMAGE SECURITY
+        size of image-> smaller
+        dwld it and check seure or not
+        DOCKERFILE:
+            reduce layers
+            remove unneccesarythings
+            user
+        IMAGE SCANNING:
+            use this on ci/cd pipeline
+        IMAGE SIGNING:
+            to ensure image integrity and security
+    2. CONATINER RUN TIME SECURITY
+    3. DOCKER HOST SECURITY
+    4. SWARM SECURITY
+
+Enterprice edition:
+    mke-mirantis kubernetes engine
+    mcr
+
+
+    dtr-docker truted registry:
+        security
+    
+commercial support
+docker content trust
+docker mtls
+
+------------------------------
+volumes:
+when the container is stop and restart:
+    image layer
+    writable layer
+tempfs -> temporary storage
+          if we dont want it to persist
+bindmount -> not recommented why?
+                permissions are maintained by user not docker
+                containers can get access to critical folder if we accidently mention
+named volumes -> managed by docker
+                 when attaching it to container we use / root directory
+                 life cycle of docker volume is managed by docker
+anonymous volume -> -v path inside the container
+
+------------------------------------------------------------
+networking:
+
+host network: connect directly to host machines network 
+null : 
+
+
+
+
+
+
+
+
+
+
