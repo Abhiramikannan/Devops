@@ -1,4 +1,7 @@
 
+SELMI DOCKER:
+
+
 Docker root directory 🡪 /var/lib/docker
 Inside this 
              Buildkit – contains container related things
