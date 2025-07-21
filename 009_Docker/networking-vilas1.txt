@@ -1,0 +1,66 @@
+Docker networking:
+        ip address: unique routable address given to a device on a network follows ip protocol
+                    network have CIDR
+        Ethernet card: wired cable connected to a socket..
+        Ethernet cable:wired cable
+        network switch: broadcast the ip with in the network
+            arp caching:cach the data by saying the ip address is related to that mac address
+
+            arp->broadcast ip sents the msg... using handshake signal
+                cach the mac address at the last
+
+        Nating/Denating:
+            gateway:connect 2 diff type of network
+            nating:from adrress is changed to that of gateway(priv ip to public)
+
+        subnet and subnetting: first 2 ip is reserved for network and broadcast
+                 
+when u install docker:
+    Docker 0:
+        root nic in vm = Eth 0
+        Ip table: make entry
+                rule:any communication happens that need to sents to docker 0
+Default ip range of docker 0:
+            172.17.0.1 -172.17.255.255
+        CIDR: 172.17.0.0/16
+
+        veth:virutal ethernet card
+         create a container also have Eth 0
+            by default the container is connected to default bridge network ie,docker 0
+            docker 0 is connected to container using  veth
+if u have another container, automatically connected to docker 0 using veth
+  docker 0 acts as switch,gateway -> broadcast the msg to all containers
+the msg will come to eth 0 in vm (default root)
+switch have default root
+
+network switch be down until a container connected to it
+
+for container,gateway is docker 0
+inside container: loopback and eth 0 can see
+create bridge network: docker network create name
+                created a network named my bridge,actually a switch
+                so the docker 0 containers and mybridge containers are not connected,they cant communicate
+docker run -d --net mybridge nginx=connecting to the network
+
+host network
+create container attcah to host network,
+    automatically connected to host  machines network,
+    no port forwarding req
+
+docker run -d --net host nginx=:not listening to port 80
+                                no ip address
+                    again try to create another container with same name, it will not work
+                    cant see the container in docker ps,you can see container got exited 
+                    because the port is already in use,network range also already in use
+                    so it will not work
+
+
+null: when u create  container and attach to none network
+    no ip
+    no network
+    y: to provide your own network 
+
+
+
+docker network connect mybridge alpine2
+when a container is running ,no ip is assigned to othr containers
