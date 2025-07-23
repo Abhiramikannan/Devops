@@ -1,0 +1,16 @@
+jenkins permission to access kubernetes
+===============================
+
+sudo mkdir -p /var/lib/jenkins/.kube
+sudo cp -r .kube /var/lib/jenkins/
+sudo chown -R jenkins:jenkins /var/lib/jenkins/.kube
+systemctl restart jenkins
+
+================================
+
+docker permission
+====================
+
+sudo usermod -aG docker jenkins
+sudo systemctl restart jenkins
+groups jenkins
