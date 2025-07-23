@@ -1,0 +1,16 @@
+To connect jenkins to port 80:
+
+cd /usr/share/java/
+nohup java -jar jenkins.war --httpPort=80 &
+cat /root/.jenkins/secrets/initialAdminPassword
+
+here the connection wont  closed if we enter the tab
+
+
+or
+cd /usr/share/java/
+java -jar jenkins.war --httpPort=80
+
+connection gets closed if we enter the tab
+
+
