@@ -10,5 +10,9 @@ Ans:
 3. namespace created
 <img width="509" height="60" alt="image" src="https://github.com/user-attachments/assets/cc8b58ef-f71b-49ef-8864-937dbf0c9965" />
 
-  <img width="661" height="236" alt="image" src="https://github.com/user-attachments/assets/96fa8a9a-5964-4c92-a0b6-ee2aa2f25a2f" />
+4. created the replicaset
+
+<img width="661" height="236" alt="image" src="https://github.com/user-attachments/assets/96fa8a9a-5964-4c92-a0b6-ee2aa2f25a2f" />
+
+5.  kubectl exec -it -n dns-ns dns-rs-cka-pbbfm -- nslookup kubernetes.default >> dns-output.txt
 
